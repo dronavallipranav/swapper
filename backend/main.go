@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	documentStore, err := db.InitDocumentStore([]string{"http://live-test.ravendb.net"}, "swapper")
+	documentStore, err := db.InitDocumentStore([]string{"http://localhost:8080"}, "swapper")
 	if err != nil {
 		log.Fatalf("Failed to initialize document store: %v", err)
 	}

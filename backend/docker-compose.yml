@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  ravendb:
+    image: ravendb/ravendb
+    environment:
+      - RAVEN_Setup_Mode=None
+      - RAVEN_License_Eula_Accepted=true
+    volumes:
+      - ravendb-data:/opt/RavenDB/Server/RavenData
+    ports:
+      - "8080:8080" # Port for RavenDB Studio
+
+volumes:
+  ravendb-data:
