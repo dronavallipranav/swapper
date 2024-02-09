@@ -1,8 +1,8 @@
 export interface Item {
     id: string;
-    name: string;
+    userid: string;
+    title: string;
     description: string;
-    imageUrl?: string;
     categories?: string[];
-    createdByUserID: string;
+    status: string;
 }
