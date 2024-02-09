@@ -6,18 +6,21 @@ const items: Item[] = [
     name: "Vintage Lamp",
     description: "A beautiful vintage lamp to light up your room.",
     imageUrl: "https://placeimg.com/640/480/any",
+    createdByUserID: '1'
   },
   {
     id: "2",
     name: "Leather Sofa",
     description: "A comfortable leather sofa in excellent condition.",
     imageUrl: "https://placeimg.com/640/480/any",
+    createdByUserID: '2',
   },
   {
     id: "3",
     name: "Wooden Dining Table",
     description: "A sturdy wooden dining table for family dinners.",
     imageUrl: "https://placeimg.com/640/480/any",
+    createdByUserID: '3'
   },
   // Add more items as needed
 ];

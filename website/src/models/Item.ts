@@ -4,4 +4,5 @@ export interface Item {
     description: string;
     imageUrl?: string;
     categories?: string[];
+    createdByUserID: string;
 }
