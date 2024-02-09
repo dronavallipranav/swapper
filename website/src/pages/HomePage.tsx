@@ -1,26 +1,17 @@
-const items = [
-  {
-    id: 1,
-    name: "Book Collection",
-    description: "A variety of novels and educational books.",
-    category: "Books",
-  },
-  {
-    id: 2,
-    name: "Garden Tools",
-    description: "Gently used garden tools.",
-    category: "Tools",
-  },
-  {
-    id: 3,
-    name: "Children's Toys",
-    description: "Assorted toys suitable for toddlers.",
-    category: "Toys",
-  },
-  // Add more items as needed
-];
+import { useEffect, useState } from "react";
+import { Item } from "../models/Item";
+import { fetchAllItems } from "../services/ItemService";
 
 function HomePage() {
+    const [items, setItems] = useState<Item[] | null>(null)
+
+    useEffect(() => {
+        fetchAllItems().then((items) => {
+            setItems(items);
+        })
+    })
+
+
   return (
     <div className="container mx-auto px-4 py-10">
       <h1 className="text-4xl font-bold text-center mb-6">
@@ -40,7 +31,7 @@ function HomePage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {items.map((item) => (
+        {items && items.map((item) => (
           <div key={item.id} className="card w-96 bg-base-100 shadow-xl">
             <figure className="px-10 pt-10">
               <img
