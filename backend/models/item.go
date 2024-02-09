@@ -5,6 +5,7 @@ type Item struct {
 	UserID      string   `json:"userId"`
 	Title       string   `json:"title"`
 	Description string   `json:"description"`
+	Quantity    int      `json:"quantity"`
 	Categories  []string `json:"categories"`
 	Status      string   `json:"status"`
 }

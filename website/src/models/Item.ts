@@ -3,6 +3,7 @@ export interface Item {
     userid: string;
     title: string;
     description: string;
+    quanity: number;
     categories?: string[];
     status: string;
 }
