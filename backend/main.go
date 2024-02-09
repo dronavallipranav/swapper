@@ -19,7 +19,7 @@ func main() {
 
 	setupRoutes(r, documentStore)
 
-	if err := r.Run(); err != nil {
+	if err := r.Run(":5050"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
 }

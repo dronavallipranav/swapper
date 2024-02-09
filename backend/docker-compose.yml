@@ -9,7 +9,7 @@ services:
     volumes:
       - ravendb-data:/opt/RavenDB/Server/RavenData
     ports:
-      - "8080:8080" # Port for RavenDB Studio
+      - "8080:8080"
 
 volumes:
   ravendb-data:
