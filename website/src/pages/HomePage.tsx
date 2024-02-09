@@ -9,7 +9,7 @@ function HomePage() {
         fetchAllItems().then((items) => {
             setItems(items);
         })
-    })
+    }, [])
 
 
   return (
@@ -44,7 +44,11 @@ function HomePage() {
               <h2 className="card-title">{item.name}</h2>
               <p>{item.description}</p>
               <div className="card-actions">
-                <button className="btn btn-primary">View Item</button>
+                <button className="btn btn-primary"
+                  onClick={() => {
+                    window.location.href = `/item/${item.id}`;
+                  }}
+                >View Item</button>
               </div>
             </div>
           </div>
