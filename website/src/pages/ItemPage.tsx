@@ -25,8 +25,7 @@ const ItemPage = () => {
   return (
     <div className="container mx-auto px-4 py-10 mt-8">
       <div className="max-w-4xl mx-auto shadow-lg rounded-lg overflow-hidden bg-base-200">
-        <img src={item.imageUrl} />
-
+        {item.imageUrl && <img src={item.imageUrl} />}
         <div className="bg-cover bg-center p-4">
           {item.categories && (
             <div className="flex justify-end">
