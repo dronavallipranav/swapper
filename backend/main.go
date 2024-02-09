@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"swapper/api"
 	"swapper/db"
 
 	"github.com/gin-gonic/gin"
@@ -31,4 +32,7 @@ func setupRoutes(r *gin.Engine, store *ravendb.DocumentStore) {
 			"message": "Hello, world!",
 		})
 	})
+
+	userHandler := api.NewUserHandler(store)
+	userHandler.RegisterUserRoutes(r)
 }
