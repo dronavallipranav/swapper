@@ -12,7 +12,7 @@ import (
 >>>>>>> 5d1e0f4 (wip auth)
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
+	"github.com/golang-jwt/jwt"
 	"github.com/ravendb/ravendb-go-client"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -109,7 +109,7 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "User signed up", "userId": user.ID})
 =======
 	// Respond to the client
-	c.JSON(http.StatusOK, gin.H{"message": "User signed up successfully", "userID": newUser.ID})
+	c.JSON(http.StatusOK, gin.H{"message": "User signed up successfully", "userName": newUser.Name})
 }
 
 type LoginRequest struct {
