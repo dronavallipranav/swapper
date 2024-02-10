@@ -33,13 +33,13 @@ function HomePage() {
         {items &&
           items.map((item) => (
             <div key={item.id} className="card w-72 bg-base-100 shadow-xl">
-              {item.imageUrl && (
+              {/*item.imageUrl && (
                 <figure>
                   <img src={item.imageUrl} alt="Item" className="rounded-xl" />
                 </figure>
-              )}
+              )*/}
               <div className="card-body items-center text-center">
-                <h2 className="card-title">{item.name}</h2>
+                <h2 className="card-title">{item.title}</h2>
                 <p>{item.description}</p>
                 <div className="card-actions">
                   <button

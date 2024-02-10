@@ -1,6 +1,6 @@
 export interface Item {
     id: string;
-    userid: string;
+    userID: string;
     title: string;
     description: string;
     quanity: number;
