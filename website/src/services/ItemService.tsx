@@ -3,24 +3,30 @@ import { Item } from "../models/Item";
 const items: Item[] = [
   {
     id: "1",
-    name: "Vintage Lamp",
+    userid: "2",
+    title: "Vintage Lamp",
     description: "A beautiful vintage lamp to light up your room.",
-    imageUrl: "https://i.imgur.com/p2xbAbE.jpeg",
-    createdByUserID: '1'
+    quanity: 1,
+    categories: ["Furniture", "Lighting"],
+    status: "Available",
   },
   {
     id: "2",
-    name: "Leather Sofa",
+    userid: "3",
+    title: "Leather Sofa",
     description: "A comfortable leather sofa in excellent condition.",
-    imageUrl: "https://i.imgur.com/p2xbAbE.jpeg",
-    createdByUserID: '2',
+    quanity: 1,
+    categories: ["Furniture"],
+    status: "Available",
   },
   {
     id: "3",
-    name: "Wooden Dining Table",
+    userid: "2",
+    title: "Wooden Dining Table",
     description: "A sturdy wooden dining table for family dinners.",
-    imageUrl: "https://i.imgur.com/p2xbAbE.jpeg",
-    createdByUserID: '3'
+    quanity: 1,
+    categories: ["Furniture"],
+    status: "Available",
   },
 ];
 
