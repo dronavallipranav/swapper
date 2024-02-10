@@ -25,7 +25,7 @@ const ItemPage = () => {
   return (
     <div className="container mx-auto px-4 py-10 mt-8">
       <div className="max-w-4xl mx-auto shadow-lg rounded-lg overflow-hidden bg-base-200">
-        {item.imageUrl && <img src={item.imageUrl} />}
+        {/*item.imageUrl && <img src={item.imageUrl} />*/}
         <div className="bg-cover bg-center p-4">
           {item.categories && (
             <div className="flex justify-end">
@@ -41,7 +41,7 @@ const ItemPage = () => {
           )}
         </div>
         <div className="p-4">
-          <h1 className="text-3xl font-bold mb-2">{item.name}</h1>
+          <h1 className="text-3xl font-bold mb-2">{item.title}</h1>
           <p className="text-gray-700 mb-4">{item.description}</p>
           <div className="flex justify-between items-center">
             <button className="btn btn-primary">Contact Owner</button>

@@ -3,16 +3,25 @@ package main
 import (
 	"log"
 	"swapper/api"
-	"swapper/db"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ravendb/ravendb-go-client"
 )
 
+func getDocumentStore(databaseName string) (*ravendb.DocumentStore, error) {
+	serverNodes := []string{"http://localhost:8080"}
+	store := ravendb.NewDocumentStore(serverNodes, databaseName)
+	if err := store.Initialize(); err != nil {
+		return nil, err
+	}
+	return store, nil
+}
+
 func main() {
-	documentStore, err := db.InitDocumentStore([]string{"http://localhost:8080"}, "swapper")
+	documentStore, err := getDocumentStore("swapper")
 	if err != nil {
 		log.Fatalf("Failed to initialize document store: %v", err)
+		return
 	}
 	defer documentStore.Close()
 
@@ -26,7 +35,6 @@ func main() {
 }
 
 func setupRoutes(r *gin.Engine, store *ravendb.DocumentStore) {
-
 	r.GET("/", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "Hello, world!",
