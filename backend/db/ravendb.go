@@ -2,6 +2,7 @@ package db
 
 import (
 	"log"
+	"strings"
 
 	ravendb "github.com/ravendb/ravendb-go-client"
 )
@@ -23,7 +24,11 @@ func InitDocumentStore(urls []string, databaseName string) (*ravendb.DocumentSto
 	createDBOp := ravendb.NewCreateDatabaseOperation(dbRecord, 1)
 	err := documentStore.Maintenance().Server().Send(createDBOp)
 	if err != nil {
-		log.Fatalf("Failed to create database: %s", err)
+		if strings.Contains(err.Error(), "DatabaseExists") || strings.Contains(err.Error(), "already exists") {
+			log.Printf("Database %s already exists. Continuing.", databaseName)
+		} else {
+			log.Fatalf("Failed to create database: %s", err)
+		}
 	}
 	return documentStore, nil
 }
