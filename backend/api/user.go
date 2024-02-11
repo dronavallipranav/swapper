@@ -64,6 +64,21 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 	}
 	defer session.Close()
 
+	//query db to check if email exists
+	var existingUsers []*models.User
+	q := session.QueryCollection("users")
+	q = q.WhereEquals("email", signUpReq.Email)
+	if err := q.GetResults(&existingUsers); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query existing users"})
+		return
+	}
+
+	//check for existing user
+	if len(existingUsers) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
+		return
+	}
+
 	// Store the new user in the database
 	if err := session.Store(&newUser); err != nil {
 		fmt.Println(err.Error())
@@ -111,7 +126,6 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	var users []*models.User //slice of users for query results
 
 	//query
-	log.Printf("Querying for user with email: %v", loginReq.Email)
 	q := session.QueryCollection("users")
 	q = q.WaitForNonStaleResults(0)
 	q = q.WhereEquals("email", loginReq.Email)
@@ -156,5 +170,5 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": jwt})
+	c.JSON(http.StatusOK, gin.H{"token": jwt, "user": user})
 }
