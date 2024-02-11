@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 <<<<<<< HEAD
 	"swapper/models"
@@ -139,16 +140,34 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	}
 	defer session.Close()
 
-	// Query the database for the user
-	var user *models.User
-	// load the user by email, which isnt indexed
+	var users []*models.User //slice of users for query results
 
-	// TODO: this doesnt work
+	//query
+	log.Printf("Querying for user with email: %v", loginReq.Email)
+	q := session.QueryCollection("users")
+	q = q.WaitForNonStaleResults(0)
+	q = q.WhereEquals("email", loginReq.Email)
+	if err := q.GetResults(&users); err != nil {
+		log.Printf("Error executing query: %v", err)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error executing query"})
+		return
+	}
 
-	if err := session.Load(&user, "users/"+loginReq.Email); err != nil {
+	//check if any user found
+	if len(users) == 0 {
+		log.Printf("User not found with email: %v", loginReq.Email)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
+
+	//multiple emails, shouldnt be possible
+	if len(users) > 1 {
+		log.Printf("Multiple users found with email: %v", loginReq.Email)
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Multiple users found"})
+	}
+
+	user := users[0]
+	log.Printf("User: %v", user)
 
 	// Compare the password hash with the provided password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginReq.Password)); err != nil {
