@@ -43,4 +43,8 @@ func setupRoutes(r *gin.Engine, store *ravendb.DocumentStore) {
 
 	userHandler := api.NewUserHandler(store)
 	userHandler.RegisterUserRoutes(r)
+
+	itemHandler := api.NewItemHandler(store)
+	itemHandler.RegisterItemRoutes(r)
+
 }

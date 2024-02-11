@@ -170,5 +170,5 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": jwt, "user": user})
+	c.JSON(http.StatusOK, gin.H{"token": jwt, "user": user, "userID": user.ID})
 }
