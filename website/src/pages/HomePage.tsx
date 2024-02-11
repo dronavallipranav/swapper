@@ -2,8 +2,11 @@ import { useEffect, useState } from "react";
 import { Item } from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
 
+const categories = ["Electronics", "Clothing", "Toys", "Home and Garden", "Sports", "Books", "Other"];
+
 function HomePage() {
   const [items, setItems] = useState<Item[] | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
     fetchAllItems().then((items) => {
@@ -22,12 +25,31 @@ function HomePage() {
       </p>
 
       <div className="mb-10">
-        <input
-          type="text"
-          placeholder="Search for items or categories..."
-          className="input input-bordered input-lg w-full max-w-xs"
-        />
-      </div>
+        <div className = "flex justify-center">
+  <input
+    type="text"
+    placeholder="Search for items or categories..."
+    className="input input-bordered input-lg w-full max-w-xs mx-auto"
+  />
+  </div>
+  <div className="tabs tabs-boxed justify-center my-4">
+    {categories.map((category) => (
+      <a
+        key={category}
+        className={`tab ${selectedCategory === category ? "tab-active" : ""}`}
+        onClick={() => setSelectedCategory(category)}
+      >
+        {category}
+      </a>
+    ))}
+    <a
+      className={`tab ${selectedCategory === null ? "tab-active" : ""}`}
+      onClick={() => setSelectedCategory(null)}
+    >
+      All
+    </a>
+  </div>
+</div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items &&
