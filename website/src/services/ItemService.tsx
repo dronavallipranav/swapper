@@ -3,8 +3,6 @@ import api from "./AxiosInterceptor";
 
 export const fetchItemById = async (itemId: string): Promise<Item>  => {
   itemId = itemId.replace("items/", "")
-  await new Promise<Item>((resolve) => setTimeout(resolve, 50));
-
   const response = await api.get<{item: Item}>(`/items/${itemId}`);
   return response.data.item;
 };
