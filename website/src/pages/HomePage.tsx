@@ -2,16 +2,40 @@ import { useEffect, useState } from "react";
 import { Item } from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
 
-const categories = ["Electronics", "Clothing", "Toys", "Home and Garden", "Sports", "Books", "Other"];
+const categories = [
+  "Electronics",
+  "Clothing",
+  "Toys",
+  "Home and Garden",
+  "Sports",
+  "Books",
+  "Other",
+];
 
 function HomePage() {
   const [items, setItems] = useState<Item[] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   useEffect(() => {
-    fetchAllItems().then((items) => {
-      setItems(items);
-    });
+    fetchAllItems({
+      latitude: 43.0731, // Default to Madison, WI latitude
+      longitude: -89.4012, // Default to Madison, WI longitude
+      radius: 10, // Example radius in miles
+      categories: [], // Example category to filter by
+      status: 'available', // Example status to filter by
+      limit: 10, // Optional: Default number of items to return
+      skip: 0, // Optional: Default number of items to skip
+      sort: 'title', // Optional: Default field to sort by
+      order: 'asc', // Optional: Default sort order
+      search: '', // Optional: Default search term, empty means no search filter
+    })
+      .then((items) => {
+        setItems(items);
+        console.log(items); // Process the fetched items
+      })
+      .catch((error) => {
+        console.error(error); // Handle potential errors
+      });
   }, []);
 
   return (
@@ -25,31 +49,33 @@ function HomePage() {
       </p>
 
       <div className="mb-10">
-        <div className = "flex justify-center">
-  <input
-    type="text"
-    placeholder="Search for items or categories..."
-    className="input input-bordered input-lg w-full max-w-xs mx-auto"
-  />
-  </div>
-  <div className="tabs tabs-boxed justify-center my-4">
-    {categories.map((category) => (
-      <a
-        key={category}
-        className={`tab ${selectedCategory === category ? "tab-active" : ""}`}
-        onClick={() => setSelectedCategory(category)}
-      >
-        {category}
-      </a>
-    ))}
-    <a
-      className={`tab ${selectedCategory === null ? "tab-active" : ""}`}
-      onClick={() => setSelectedCategory(null)}
-    >
-      All
-    </a>
-  </div>
-</div>
+        <div className="flex justify-center">
+          <input
+            type="text"
+            placeholder="Search for items or categories..."
+            className="input input-bordered input-lg w-full max-w-xs mx-auto"
+          />
+        </div>
+        <div className="tabs tabs-boxed justify-center my-4">
+          {categories.map((category) => (
+            <a
+              key={category}
+              className={`tab ${
+                selectedCategory === category ? "tab-active" : ""
+              }`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </a>
+          ))}
+          <a
+            className={`tab ${selectedCategory === null ? "tab-active" : ""}`}
+            onClick={() => setSelectedCategory(null)}
+          >
+            All
+          </a>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items &&

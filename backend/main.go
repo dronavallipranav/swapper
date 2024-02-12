@@ -4,6 +4,7 @@ import (
 	"log"
 	"swapper/api"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/ravendb/ravendb-go-client"
 )
@@ -18,14 +19,21 @@ func getDocumentStore(databaseName string) (*ravendb.DocumentStore, error) {
 }
 
 func main() {
+	r := gin.Default()
+	corsConfig := cors.DefaultConfig()
+
+	corsConfig.AllowOrigins = []string{"*"}
+	corsConfig.AllowMethods = []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"}
+	corsConfig.AllowHeaders = []string{"Origin", "Content-Type", "Accept", "Authorization"}
+	corsConfig.AllowCredentials = true
+	r.Use(cors.New(corsConfig))
+
 	documentStore, err := getDocumentStore("swapper")
 	if err != nil {
 		log.Fatalf("Failed to initialize document store: %v", err)
 		return
 	}
 	defer documentStore.Close()
-
-	r := gin.Default()
 
 	setupRoutes(r, documentStore)
 
@@ -46,5 +54,4 @@ func setupRoutes(r *gin.Engine, store *ravendb.DocumentStore) {
 
 	itemHandler := api.NewItemHandler(store)
 	itemHandler.RegisterItemRoutes(r)
-
 }
