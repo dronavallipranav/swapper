@@ -8,6 +8,7 @@ const ItemPage = () => {
   const [item, setItem] = useState<Item | null>(null);
 
   useEffect(() => {
+    console.log('id', itemID)
     if (!itemID) return;
     fetchItemById(itemID).then((fetchedItem) => {
       setItem(fetchedItem);
