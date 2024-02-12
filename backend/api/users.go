@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"reflect"
 	"swapper/models"
 	"time"
 
@@ -109,14 +110,23 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 
 	// Query the database for the user
 	var user *models.User
-	// load the user by email, which isnt indexed
+	tp := reflect.TypeOf(&models.User{})
+	q := session.QueryCollectionForType(tp)
 
-	// TODO: this doesnt work
+	q = q.WhereEquals("email", loginReq.Email).Take(1)
 
-	if err := session.Load(&user, "users/"+loginReq.Email); err != nil {
+	var users []*models.User
+	err = q.GetResults(&users)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query user"})
+		return
+	}
+
+	if len(users) == 0 {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
+	user = users[0]
 
 	// Compare the password hash with the provided password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginReq.Password)); err != nil {
