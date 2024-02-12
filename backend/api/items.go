@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"reflect"
 	"strconv"
@@ -103,18 +104,20 @@ url params:
 - sort (string): sort by field (default "title")
 - order (string): sort order (default "asc")
 - search (string): search across the title field
+
+TODO: fix because i do not like ravendb
 */
 func (h *ItemHandler) GetItems(c *gin.Context) {
-	lat := c.Query("lat")
-	long := c.Query("long")
-	radius := c.DefaultQuery("radius", "25")
-	category := c.Query("category")
-	status := c.Query("status")
+	//lat := c.Query("lat")
+	//long := c.Query("long")
+	//radius := c.DefaultQuery("radius", "25")
+	//categories := c.QueryArray("categories")
+	//status := c.Query("status")
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 	skip, _ := strconv.Atoi(c.DefaultQuery("skip", "0"))
-	sort := c.DefaultQuery("sort", "title")
-	order := c.DefaultQuery("order", "asc")
-	search := c.Query("search")
+	//sort := c.DefaultQuery("sort", "title")
+	//order := c.DefaultQuery("order", "asc")
+	//search := c.Query("search")
 
 	session, err := h.Store.OpenSession("")
 	if err != nil {
@@ -127,36 +130,42 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	tp := reflect.TypeOf(&models.Item{})
 	q := session.QueryCollectionForType(tp)
 
-	if lat != "" && long != "" && radius != "" {
+	/*if lat != "" && long != "" && radius != "" {
 		latFloat, _ := strconv.ParseFloat(lat, 64)
 		longFloat, _ := strconv.ParseFloat(long, 64)
 		radiusFloat, _ := strconv.ParseFloat(radius, 64)
 
 		q = q.WithinRadiusOf("Location", radiusFloat, latFloat, longFloat)
-	}
+	}*/
 
-	if category != "" {
-		q = q.WhereEquals("Categories", category)
-	}
+	/*if len(categories) > 0 {
+		var categoriesInterface []interface{}
+		for _, category := range categories {
+			categoriesInterface = append(categoriesInterface, category)
+		}
 
-	if status != "" {
+		q = q.WhereIn("Categories", categoriesInterface)
+	}*/
+
+	/*if status != "" {
 		q = q.WhereEquals("Status", status)
 	}
 
 	if search != "" {
 		q.Search("Title", search)
-	}
+	}*/
 
 	q = q.Skip(skip).Take(limit)
 
-	if order == "asc" {
+	/*if order == "asc" {
 		q = q.OrderBy(sort)
 	} else {
 		q = q.OrderByDescending(sort)
-	}
+	}*/
 
 	err = q.GetResults(&items)
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query items"})
 		return
 	}
