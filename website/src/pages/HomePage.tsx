@@ -31,7 +31,6 @@ function HomePage() {
     })
       .then((items) => {
         setItems(items);
-        console.log(items); // Process the fetched items
       })
       .catch((error) => {
         console.error(error); // Handle potential errors
