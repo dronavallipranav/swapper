@@ -2,14 +2,13 @@ package api
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"swapper/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt"
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/ravendb/ravendb-go-client"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -64,21 +63,6 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 	}
 	defer session.Close()
 
-	//query db to check if email exists
-	var existingUsers []*models.User
-	q := session.QueryCollection("users")
-	q = q.WhereEquals("email", signUpReq.Email)
-	if err := q.GetResults(&existingUsers); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query existing users"})
-		return
-	}
-
-	//check for existing user
-	if len(existingUsers) > 0 {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "User with this email already exists"})
-		return
-	}
-
 	// Store the new user in the database
 	if err := session.Store(&newUser); err != nil {
 		fmt.Println(err.Error())
@@ -93,7 +77,7 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 	}
 
 	// Respond to the client
-	c.JSON(http.StatusOK, gin.H{"message": "User signed up successfully", "userName": newUser.Name})
+	c.JSON(http.StatusOK, gin.H{"message": "User signed up successfully", "userID": newUser.ID})
 }
 
 type LoginRequest struct {
@@ -123,33 +107,16 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	}
 	defer session.Close()
 
-	var users []*models.User //slice of users for query results
+	// Query the database for the user
+	var user *models.User
+	// load the user by email, which isnt indexed
 
-	//query
-	q := session.QueryCollection("users")
-	q = q.WaitForNonStaleResults(0)
-	q = q.WhereEquals("email", loginReq.Email)
-	if err := q.GetResults(&users); err != nil {
-		log.Printf("Error executing query: %v", err)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error executing query"})
-		return
-	}
+	// TODO: this doesnt work
 
-	//check if any user found
-	if len(users) == 0 {
-		log.Printf("User not found with email: %v", loginReq.Email)
+	if err := session.Load(&user, "users/"+loginReq.Email); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "User not found"})
 		return
 	}
-
-	//multiple emails, shouldnt be possible
-	if len(users) > 1 {
-		log.Printf("Multiple users found with email: %v", loginReq.Email)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Multiple users found"})
-	}
-
-	user := users[0]
-	log.Printf("User: %v", user)
 
 	// Compare the password hash with the provided password
 	if err := bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(loginReq.Password)); err != nil {
@@ -170,5 +137,5 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": jwt, "user": user, "userID": user.ID})
+	c.JSON(http.StatusOK, gin.H{"token": jwt})
 }
