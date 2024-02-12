@@ -2,6 +2,8 @@ package api
 
 import (
 	"net/http"
+	"reflect"
+	"strconv"
 	"swapper/middleware"
 	"swapper/models"
 
@@ -22,11 +24,11 @@ func NewItemHandler(store *ravendb.DocumentStore) *ItemHandler {
 func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 	items := r.Group("/items")
 	//use auth middleware for all items routes and grab user from context to ensure they can only modify their items
-	items.POST("/add", middleware.AuthMiddleware(), h.AddItem)
+	items.POST("", middleware.AuthMiddleware(), h.AddItem)
+	items.GET("", h.GetItems)
 }
 
 type AddItemRequest struct {
-	UserID      string          `json:"user"`
 	Title       string          `json:"title" binding:"required"`
 	Description string          `json:"description"`
 	Quantity    *int            `json:"quantity"`
@@ -35,8 +37,6 @@ type AddItemRequest struct {
 }
 
 func (h *ItemHandler) AddItem(c *gin.Context) {
-
-	//grab userID from context
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -86,5 +86,80 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, newItem.Title)
+	c.JSON(http.StatusOK, gin.H{"id": newItem.ID})
+}
+
+/*
+Returns items based on filters
+
+url params:
+- lat (float): latitude
+- long (float): longitude
+- radius (float): radius in miles
+- category (string): category to filter by
+- status (string): status to filter by
+- limit (int): limit the number of items returned (default 10)
+- skip (int): skip the first n items (default 0)
+- sort (string): sort by field (default "title")
+- order (string): sort order (default "asc")
+- search (string): search across the title field
+*/
+func (h *ItemHandler) GetItems(c *gin.Context) {
+	lat := c.Query("lat")
+	long := c.Query("long")
+	radius := c.DefaultQuery("radius", "25")
+	category := c.Query("category")
+	status := c.Query("status")
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	skip, _ := strconv.Atoi(c.DefaultQuery("skip", "0"))
+	sort := c.DefaultQuery("sort", "title")
+	order := c.DefaultQuery("order", "asc")
+	search := c.Query("search")
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var items []*models.Item
+	tp := reflect.TypeOf(&models.Item{})
+	q := session.QueryCollectionForType(tp)
+
+	if lat != "" && long != "" && radius != "" {
+		latFloat, _ := strconv.ParseFloat(lat, 64)
+		longFloat, _ := strconv.ParseFloat(long, 64)
+		radiusFloat, _ := strconv.ParseFloat(radius, 64)
+
+		q = q.WithinRadiusOf("Location", radiusFloat, latFloat, longFloat)
+	}
+
+	if category != "" {
+		q = q.WhereEquals("Categories", category)
+	}
+
+	if status != "" {
+		q = q.WhereEquals("Status", status)
+	}
+
+	if search != "" {
+		q.Search("Title", search)
+	}
+
+	q = q.Skip(skip).Take(limit)
+
+	if order == "asc" {
+		q = q.OrderBy(sort)
+	} else {
+		q = q.OrderByDescending(sort)
+	}
+
+	err = q.GetResults(&items)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query items"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"items": items})
 }
