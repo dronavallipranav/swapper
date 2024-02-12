@@ -46,7 +46,6 @@ export const fetchAllItems = async ({
   }).toString();
 
   // Use `api.get` to make the request with query parameters
-  const response = await api.get<Item[]>(`/items?${queryParams}`);
-  console.log(response.data);
-  return response.data; // Assuming the response structure includes a `data` field with the items
+  const response = await api.get<{items: Item[]}>(`/items?${queryParams}`);
+  return response.data.items; // Assuming the response structure includes a `data` field with the items
 };
