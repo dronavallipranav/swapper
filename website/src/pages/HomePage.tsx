@@ -92,7 +92,7 @@ function HomePage() {
                   <button
                     className="btn btn-primary"
                     onClick={() => {
-                      window.location.href = `/item/${item.id}`;
+                      window.location.href = `/item/${item.id.replace("items/", "")}`;
                     }}
                   >
                     View Item

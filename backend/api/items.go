@@ -27,6 +27,7 @@ func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 	//use auth middleware for all items routes and grab user from context to ensure they can only modify their items
 	items.POST("", middleware.AuthMiddleware(), h.AddItem)
 	items.GET("", h.GetItems)
+	items.GET("/:id", h.GetItem)
 }
 
 type AddItemRequest struct {
@@ -171,4 +172,25 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"items": items})
+}
+
+func (h *ItemHandler) GetItem(c *gin.Context) {
+	id := c.Param("id")
+	id = "items/" + id
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var item *models.Item
+	err = session.Load(&item, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"item": item})
 }
