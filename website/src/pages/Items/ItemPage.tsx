@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Item } from "../models/Item";
-import { fetchItemById } from "../services/ItemService";
+import { Item } from "../../models/Item";
+import { fetchItemById } from "../../services/ItemService";
 
 const ItemPage = () => {
   let { itemID } = useParams();
