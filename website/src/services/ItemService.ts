@@ -49,3 +49,8 @@ export const fetchAllItems = async ({
   const response = await api.get<{items: Item[]}>(`/items?${queryParams}`);
   return response.data.items; // Assuming the response structure includes a `data` field with the items
 };
+
+export const createItem = async (item: Item): Promise<string> => {
+  const response = await api.post<{id: string}>(`/items`, item);
+  return response.data.id;
+}
