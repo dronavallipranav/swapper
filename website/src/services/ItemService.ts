@@ -3,8 +3,7 @@ import { Item } from "../models/Item";
 import api from "./AxiosInterceptor";
 
 export const fetchItemById = async (itemId: string): Promise<Item>  => {
-  itemId = itemId.replace("items/", "")
-  const response = await api.get<{item: Item}>(`/items/${itemId}`);
+  const response = await api.get<{item: Item}>(`/${itemId}`);
   return response.data.item;
 };
 
@@ -57,5 +56,5 @@ export const createItem = async (item: Item): Promise<string> => {
 }
 
 export const deleteItem = async (itemId: string): Promise<AxiosResponse> => {
-  return api.delete(`/items/${itemId.replace("items/", "")}`);
+  return api.delete(`/${itemId}`);
 }

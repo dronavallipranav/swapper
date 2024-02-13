@@ -27,14 +27,14 @@ function App() {
 
               {/* Item Routes */}
               <Route
-                path="/item/create"
+                path="/items/create"
                 element={
                   <ProtectedRoute>
                     <NewItemPage />
                   </ProtectedRoute>
                 }
               />
-              <Route path="/item/:itemID" element={<ItemPage />} />
+              <Route path="/items/:itemID" element={<ItemPage />} />
 
               {/* Message Routes */}
               <Route
