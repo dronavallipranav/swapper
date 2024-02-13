@@ -30,6 +30,7 @@ function HomePage() {
       search: '', // Optional: Default search term, empty means no search filter
     })
       .then((items) => {
+        console.log(items);
         setItems(items);
       })
       .catch((error) => {
