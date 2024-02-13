@@ -19,7 +19,7 @@ const Header = () => {
               Messages
             </Link>
             <Link
-              to="/item/create"
+              to="/items/create"
               className="btn btn-ghost normal-case text-xl"
             >
               Create Item

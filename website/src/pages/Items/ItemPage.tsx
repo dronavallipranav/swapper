@@ -14,7 +14,7 @@ const ItemPage = () => {
 
   useEffect(() => {
     if (!itemID) return;
-    fetchItemById(itemID).then((fetchedItem) => {
+    fetchItemById("items/" + itemID).then((fetchedItem) => {
       setItem(fetchedItem);
       if (user !== null && fetchedItem.userId === user.id) {
         setIsItemOwner(true);

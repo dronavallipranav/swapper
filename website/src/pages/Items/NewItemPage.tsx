@@ -29,7 +29,7 @@ export const NewItemPage = () => {
       createItem(item).then((id) => {
         setError("");
         // Redirect to the item's page after successful creation
-        nav(`/item/${id.replace("items/", "")}`);
+        nav(`/${id}`);
       }).catch((e) => {
         if (e.response.data.error) {
           setError(e.response.data.error);
