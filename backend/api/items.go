@@ -3,7 +3,6 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"reflect"
 	"strconv"
 	"swapper/middleware"
 	"swapper/models"
@@ -111,7 +110,7 @@ url params:
 - lat (float): latitude
 - long (float): longitude
 - radius (float): radius in miles
-- category (string): category to filter by
+- categories (string[]): category to filter by
 - status (string): status to filter by
 - limit (int): limit the number of items returned (default 10)
 - skip (int): skip the first n items (default 0)
@@ -119,7 +118,7 @@ url params:
 - order (string): sort order (default "asc")
 - search (string): search across the title field
 
-TODO: fix because i do not like ravendb
+TODO:
 */
 func (h *ItemHandler) GetItems(c *gin.Context) {
 	//lat := c.Query("lat")
@@ -128,7 +127,6 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	//categories := c.QueryArray("categories")
 	//status := c.Query("status")
 	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	skip, _ := strconv.Atoi(c.DefaultQuery("skip", "0"))
 	//sort := c.DefaultQuery("sort", "title")
 	//order := c.DefaultQuery("order", "asc")
 	//search := c.Query("search")
@@ -141,41 +139,9 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	defer session.Close()
 
 	var items []*models.Item
-	tp := reflect.TypeOf(&models.Item{})
-	q := session.QueryCollectionForType(tp)
-
-	/*if lat != "" && long != "" && radius != "" {
-		latFloat, _ := strconv.ParseFloat(lat, 64)
-		longFloat, _ := strconv.ParseFloat(long, 64)
-		radiusFloat, _ := strconv.ParseFloat(radius, 64)
-
-		q = q.WithinRadiusOf("Location", radiusFloat, latFloat, longFloat)
-	}*/
-
-	/*if len(categories) > 0 {
-		var categoriesInterface []interface{}
-		for _, category := range categories {
-			categoriesInterface = append(categoriesInterface, category)
-		}
-
-		q = q.WhereIn("Categories", categoriesInterface)
-	}*/
-
-	/*if status != "" {
-		q = q.WhereEquals("Status", status)
-	}
-
-	if search != "" {
-		q.Search("Title", search)
-	}*/
-
-	q = q.Skip(skip).Take(limit)
-
-	/*if order == "asc" {
-		q = q.OrderBy(sort)
-	} else {
-		q = q.OrderByDescending(sort)
-	}*/
+	q := session.QueryCollection("items")
+	//q = q.WithinRadiusOf("Coordinates", 250000, -74.0060, 40.7128)
+	q = q.Take(limit)
 
 	err = q.GetResults(&items)
 	if err != nil {
