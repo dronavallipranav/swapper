@@ -45,6 +45,19 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		return
 	}
 
+	// Extract the JSON part of the request, for images
+	jsonData, err := c.FormFile("data")
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing data part"})
+		return
+	}
+	dataFile, err := jsonData.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not open data part"})
+		return
+	}
+	defer dataFile.Close()
+
 	var addItemReq AddItemRequest
 	if err := c.ShouldBindJSON(&addItemReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
