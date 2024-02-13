@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"swapper/api"
+	"swapper/indexing"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -34,6 +35,9 @@ func main() {
 		return
 	}
 	defer documentStore.Close()
+
+	//setup spatial indexing
+	documentStore.ExecuteIndex(indexing.CreateItemLocationIndex(), "swapper")
 
 	setupRoutes(r, documentStore)
 
