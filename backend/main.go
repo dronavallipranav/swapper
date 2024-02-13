@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"swapper/api"
+	"swapper/indexing"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -35,6 +36,9 @@ func main() {
 	}
 	defer documentStore.Close()
 
+	//setup spatial indexing
+	documentStore.ExecuteIndex(indexing.CreateItemLocationIndex(), "swapper")
+
 	setupRoutes(r, documentStore)
 
 	if err := r.Run(":5050"); err != nil {
@@ -54,4 +58,7 @@ func setupRoutes(r *gin.Engine, store *ravendb.DocumentStore) {
 
 	itemHandler := api.NewItemHandler(store)
 	itemHandler.RegisterItemRoutes(r)
+
+	messageHandler := api.NewMessageHandler(store)
+	messageHandler.RegisterMessageRoutes(r)
 }
