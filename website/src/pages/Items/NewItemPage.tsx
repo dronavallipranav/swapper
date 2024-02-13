@@ -17,7 +17,7 @@ export const NewItemPage = () => {
     e.preventDefault();
     const item = {
       id: "", 
-      userID: "",
+      userId: "",
       title,
       description,
       quantity: Number(quantity),

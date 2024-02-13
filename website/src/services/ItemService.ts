@@ -1,3 +1,4 @@
+import { AxiosResponse } from "axios";
 import { Item } from "../models/Item";
 import api from "./AxiosInterceptor";
 
@@ -53,4 +54,8 @@ export const fetchAllItems = async ({
 export const createItem = async (item: Item): Promise<string> => {
   const response = await api.post<{id: string}>(`/items`, item);
   return response.data.id;
+}
+
+export const deleteItem = async (itemId: string): Promise<AxiosResponse> => {
+  return api.delete(`/items/${itemId.replace("items/", "")}`);
 }
