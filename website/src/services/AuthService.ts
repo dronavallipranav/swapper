@@ -47,7 +47,7 @@ export const login = (
   });
 };
 
-export const logout = (): void => {
+export const logout = () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
 };

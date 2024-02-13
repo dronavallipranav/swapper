@@ -7,32 +7,34 @@ import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import MessagePage from "./pages/MessagePage";
 
+import LogoutPage from "./pages/LogoutPage";
+import Header from "./components/Header";
+import { AuthProvider } from "./contexts/AuthContext";
 function App() {
   return (
     <>
       <div className="min-h-screen">
-        <BrowserRouter>
-          <div className="navbar bg-base-100">
-            <Link to="/" className="btn btn-ghost normal-case text-xl">
-              Swapper
-            </Link>
-            <Link to="/about" className="btn btn-ghost normal-case text-xl">
-              About
-            </Link>
-            <Link to="/messages" className="btn btn-ghost normal-case text-xl">
-              Messages
-            </Link>
-          </div>
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/about" element={<AboutPage />} />
-            <Route path="/item/:itemID" element={<ItemPage />} /> 
+        <AuthProvider>
+          <BrowserRouter>
+            <Header />
+            <Routes>
+              {/* Main Pages */}
+              <Route path="/" element={<HomePage />} />
+              <Route path="/about" element={<AboutPage />} />
 
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/messages" element={<MessagePage />} /> 
-          </Routes>
-        </BrowserRouter>
+              {/* Item Routes */}
+              <Route path="/item/:itemID" element={<ItemPage />} />
+
+              {/* Message Routes */}
+              <Route path="/messages" element={<MessagePage />} />
+
+              {/* Authentication Routes */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} />
+              <Route path="/logout" element={<LogoutPage />} />
+            </Routes>
+          </BrowserRouter>
+        </AuthProvider>
       </div>
       <Footer />
     </>
