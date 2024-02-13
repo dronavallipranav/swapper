@@ -1,19 +1,26 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { Item } from "../../models/Item";
-import { fetchItemById } from "../../services/ItemService";
+import { deleteItem, fetchItemById } from "../../services/ItemService";
+import { useAuth } from "../../contexts/AuthContext";
 
 const ItemPage = () => {
   let { itemID } = useParams();
   const [item, setItem] = useState<Item | null>(null);
+  const [isItemOwner, setIsItemOwner] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const nav = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
-    console.log('id', itemID)
     if (!itemID) return;
     fetchItemById(itemID).then((fetchedItem) => {
       setItem(fetchedItem);
+      if (user !== null && fetchedItem.userId === user.id) {
+        setIsItemOwner(true);
+      }
     });
-  }, [itemID]);
+  }, [itemID, user]);
 
   if (!item) {
     return (
@@ -27,6 +34,7 @@ const ItemPage = () => {
     <div className="container mx-auto px-4 py-10 mt-8">
       <div className="max-w-4xl mx-auto shadow-lg rounded-lg overflow-hidden bg-base-200">
         {/*item.imageUrl && <img src={item.imageUrl} />*/}
+        {error && <p className="text-red-500">{error}</p>}
         <div className="bg-cover bg-center p-4">
           {item.categories && (
             <div className="flex justify-end">
@@ -46,6 +54,26 @@ const ItemPage = () => {
           <p className="text-gray-700 mb-4">{item.description}</p>
           <div className="flex justify-between items-center">
             <button className="btn btn-primary">Contact Owner</button>
+            {isItemOwner && (
+              <div className="flex gap-2">
+                <button className="btn btn-ghost">Edit</button>
+                <button 
+                  onClick={() => {
+                    deleteItem(item.id).then(() => {
+                      // Redirect to the home page after successful deletion
+                      nav("/");
+                    }).catch((e) => {
+                      if (e.response.data.error) {
+                        setError(e.response.data.error);
+                        return;
+                      }
+                      setError("An error occurred. Please try again.");
+          
+                    })
+                  }}
+                className="btn btn-error">Delete</button>
+              </div>
+            )}
           </div>
         </div>
       </div>

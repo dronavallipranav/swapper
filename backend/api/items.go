@@ -27,6 +27,7 @@ func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 	items.POST("", middleware.AuthMiddleware(), h.AddItem)
 	items.GET("", h.GetItems)
 	items.GET("/:id", h.GetItem)
+	items.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteItem)
 }
 
 type AddItemRequest struct {
@@ -172,4 +173,48 @@ func (h *ItemHandler) GetItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"item": item})
+}
+
+func (h *ItemHandler) DeleteItem(c *gin.Context) {
+	id := c.Param("id")
+	id = "items/" + id
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var item *models.Item
+	err = session.Load(&item, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
+		return
+	}
+
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	if item.UserID != userID {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	err = session.Delete(item)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete item"})
+		return
+	}
+
+	err = session.SaveChanges()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Item deleted"})
 }
