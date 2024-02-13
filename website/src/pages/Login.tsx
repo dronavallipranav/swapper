@@ -1,16 +1,19 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { login } from "../services/AuthService";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const nav = useNavigate();
+  const { loginUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-      login({ email, password }).then((_) => {
+      login({ email, password }).then((user) => {
+        loginUser(user);
         nav('/'); // Redirect to home page on successful login
       }).catch((e) => {
         if (e.response.data.error) {

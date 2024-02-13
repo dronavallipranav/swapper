@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../services/AuthService';
+import { useAuth } from "../contexts/AuthContext";
 
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
@@ -8,10 +9,12 @@ const RegisterPage: React.FC = () => {
   const [name, setName] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
+  const { loginUser } = useAuth();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    register(email, password, name).then(() => {
+    register(email, password, name).then((user) => {
+        loginUser(user);
         navigate('/'); // Redirect to the home page after successful registration
     }).catch((e) => {
         if (e.response.data.error) {
