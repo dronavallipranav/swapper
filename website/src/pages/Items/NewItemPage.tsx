@@ -61,14 +61,7 @@ export const NewItemPage = () => {
             <label htmlFor="categories" className="block">Categories (comma-separated)</label>
             <input type="text" id="categories" value={categories} onChange={(e) => setCategories(e.target.value)} className="w-full px-4 py-2 mt-2 border rounded-md" />
           </div>
-          <div className="mt-4">
-            <label htmlFor="status" className="block">Status</label>
-            <select id="status" value={status} onChange={(e) => setStatus(e.target.value)} className="w-full px-4 py-2 mt-2 border rounded-md">
-              <option value="">Select a status</option>
-              <option value="available">Available</option>
-              <option value="unavailable">Unavailable</option>
-            </select>
-          </div>
+
           <div className="flex justify-end mt-6">
             <button type="submit" className="px-6 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700">Create Item</button>
           </div>

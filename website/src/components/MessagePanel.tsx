@@ -3,13 +3,14 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Message } from '../models/Message';
 
-const currentUserID = "users/33-A";
+const currentUserID = "users/99-A";
 
 const MessagePanel: React.FC = () => {
+  //grab the recipient's user ID from the URL
   const { userId } = useParams<{ userId: string }>(); 
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
-
+  
   useEffect(() => {
     const fetchMessages = async () => {
       try {
@@ -30,6 +31,7 @@ const MessagePanel: React.FC = () => {
       senderID: currentUserID,
       recipientID: userId as string,
       text: newMessage,
+      sentAt: null as any as Date,
     };
 
     try {
