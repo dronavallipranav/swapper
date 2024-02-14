@@ -3,7 +3,7 @@ package api
 import (
 	"encoding/base64"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"mime"
 	"net/http"
 	"path/filepath"
@@ -220,7 +220,7 @@ func (h *ItemHandler) GetItem(c *gin.Context) {
 			// continue to next attachment
 			continue
 		}
-		bytes, err := ioutil.ReadAll(stream.Data)
+		bytes, err := io.ReadAll(stream.Data)
 		stream.Close() // Ensure the stream is closed after use
 		if err != nil {
 			// continue to next attachment
