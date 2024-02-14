@@ -50,10 +50,15 @@ export const fetchAllItems = async ({
   return response.data.items; // Assuming the response structure includes a `data` field with the items
 };
 
-export const createItem = async (item: Item): Promise<string> => {
-  const response = await api.post<{id: string}>(`/items`, item);
+export const createItem = async (formData: FormData): Promise<string> => {
+  const response = await api.post<{id: string}>('/items', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
   return response.data.id;
-}
+};
+
 
 export const deleteItem = async (itemId: string): Promise<AxiosResponse> => {
   return api.delete(`/${itemId}`);

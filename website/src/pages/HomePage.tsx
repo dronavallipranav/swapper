@@ -23,7 +23,7 @@ function HomePage() {
       radius: 10, // Example radius in miles
       categories: [], // Example category to filter by
       status: 'available', // Example status to filter by
-      limit: 10, // Optional: Default number of items to return
+      limit: 500, // Optional: Default number of items to return
       skip: 0, // Optional: Default number of items to skip
       sort: 'title', // Optional: Default field to sort by
       order: 'asc', // Optional: Default sort order

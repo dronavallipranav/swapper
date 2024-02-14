@@ -15,4 +15,5 @@ type Item struct {
 	Categories  []string `json:"categories"`
 	Status      string   `json:"status"`
 	Location    Location `json:"location"`
+	Attachments []string `json:"attachments"`
 }

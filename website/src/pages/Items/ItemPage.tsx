@@ -32,47 +32,94 @@ const ItemPage = () => {
 
   return (
     <div className="container mx-auto px-4 py-10 mt-8">
-      <div className="max-w-4xl mx-auto shadow-lg rounded-lg overflow-hidden bg-base-200">
-        {/*item.imageUrl && <img src={item.imageUrl} />*/}
-        {error && <p className="text-red-500">{error}</p>}
-        <div className="bg-cover bg-center p-4">
+      <div className="card lg:card-side bg-base-200 shadow-xl">
+        {error && <div className="alert alert-error">{error}</div>}
+        <div className="card-body">
           {item.categories && (
-            <div className="flex justify-end">
-              <span className="badge badge-ghost badge-lg">
-                Categories:{" "}
-                {item.categories.map((category, _) => (
-                  <span key={category} className="badge badge-ghost badge-lg">
-                    {category}
-                  </span>
-                ))}
-              </span>
+            <div className="badge badge-outline">
+              Categories:{" "}
+              {item.categories.map((category, index) => (
+                <span key={index} className="badge badge-outline mx-1">
+                  {category}
+                </span>
+              ))}
             </div>
           )}
-        </div>
-        <div className="p-4">
-          <h1 className="text-3xl font-bold mb-2">{item.title}</h1>
-          <p className="text-gray-700 mb-4">{item.description}</p>
-          <div className="flex justify-between items-center">
+
+          {/* Images Display Section */}
+          <div className="flex flex-wrap justify-center mt-4">
+            <div className="carousel w-full">
+              {item.attachments &&
+                item.attachments.map((base64EncodedImage, index) => (
+                  <div
+                    id={`slide${index}`}
+                    className="carousel-item relative w-full"
+                  >
+                    <img
+                      src={`data:image/png;base64,${base64EncodedImage}`}
+                      alt={`Attachment ${index}`}
+                      className="rounded-box"
+                    />
+                    <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                      <a
+                        href={
+                          `#slide` +
+                          (index === 0
+                            ? (item.attachments?.length ?? 0) - 1
+                            : index - 1)
+                        }
+                        className="btn btn-circle"
+                      >
+                        ❮
+                      </a>
+                      <a
+                        href={
+                          "#slide" +
+                          (index === (item.attachments?.length ?? 0) - 1
+                            ? 0
+                            : index + 1)
+                        }
+                        className="btn btn-circle"
+                      >
+                        ❯
+                      </a>
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          <h2 className="card-title">{item.title}</h2>
+          <p>{item.description}</p>
+          <div className="card-actions justify-end">
             <button className="btn btn-primary">Contact Owner</button>
             {isItemOwner && (
-              <div className="flex gap-2">
-                <button className="btn btn-ghost">Edit</button>
-                <button 
+              <>
+                <button className="btn btn-secondary">Edit</button>
+                <button
                   onClick={() => {
-                    deleteItem(item.id).then(() => {
-                      // Redirect to the home page after successful deletion
-                      nav("/");
-                    }).catch((e) => {
-                      if (e.response.data.error) {
-                        setError(e.response.data.error);
-                        return;
-                      }
-                      setError("An error occurred. Please try again.");
-          
-                    })
+                    deleteItem(item.id)
+                      .then(() => {
+                        // Redirect to the home page after successful deletion
+                        nav("/");
+                      })
+                      .catch((e) => {
+                        if (
+                          e.response &&
+                          e.response.data &&
+                          e.response.data.error
+                        ) {
+                          setError(e.response.data.error);
+                          return;
+                        }
+                        setError("An error occurred. Please try again.");
+                      });
                   }}
-                className="btn btn-error">Delete</button>
-              </div>
+                  className="btn btn-error"
+                >
+                  Delete
+                </button>
+              </>
             )}
           </div>
         </div>
