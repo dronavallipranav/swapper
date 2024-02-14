@@ -37,7 +37,7 @@ func main() {
 	defer documentStore.Close()
 
 	//setup spatial indexing
-	documentStore.ExecuteIndex(indexing.NewMyIndex(), "swapper")
+	documentStore.ExecuteIndex(indexing.NewSpatialIndex(), "swapper")
 
 	setupRoutes(r, documentStore)
 
