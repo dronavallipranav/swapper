@@ -6,4 +6,6 @@ export interface Item {
     quantity: number;
     categories?: string[];
     status: string;
+    images?: string[];
+    attachments?: string[];
 }

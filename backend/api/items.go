@@ -1,8 +1,12 @@
 package api
 
 import (
+	"encoding/base64"
 	"fmt"
+	"io/ioutil"
+	"mime"
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"swapper/middleware"
 	"swapper/models"
@@ -23,7 +27,7 @@ func NewItemHandler(store *ravendb.DocumentStore) *ItemHandler {
 
 func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 	items := r.Group("/items")
-	//use auth middleware for all items routes and grab user from context to ensure they can only modify their items
+
 	items.POST("", middleware.AuthMiddleware(), h.AddItem)
 	items.GET("", h.GetItems)
 	items.GET("/:id", h.GetItem)
@@ -31,11 +35,11 @@ func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 }
 
 type AddItemRequest struct {
-	Title       string          `json:"title" binding:"required"`
-	Description string          `json:"description"`
-	Quantity    *int            `json:"quantity"`
-	Categories  []string        `json:"categories"`
-	Location    models.Location `json:"location"`
+	Title       string          `form:"title" binding:"required"`
+	Description string          `form:"description"`
+	Quantity    *int            `form:"quantity"`
+	Categories  []string        `form:"categories"`
+	Location    models.Location `form:"location"`
 }
 
 func (h *ItemHandler) AddItem(c *gin.Context) {
@@ -45,22 +49,14 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		return
 	}
 
-	// Extract the JSON part of the request, for images
-	/*jsonData, err := c.FormFile("data")
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing data part"})
+	if err := c.Request.ParseMultipartForm(32 << 20); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse multipart form"})
 		return
 	}
-	dataFile, err := jsonData.Open()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not open data part"})
-		return
-	}
-	defer dataFile.Close()*/
 
 	var addItemReq AddItemRequest
-	if err := c.ShouldBindJSON(&addItemReq); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
+	if err := c.ShouldBind(&addItemReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
 		return
 	}
 
@@ -93,6 +89,31 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store item"})
 		return
+	}
+
+	err = session.SaveChanges()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
+		return
+	}
+
+	form, _ := c.MultipartForm()
+	files := form.File["images"]
+	for _, file := range files {
+		fileStream, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+			return
+		}
+		defer fileStream.Close()
+
+		mimeType := mime.TypeByExtension(filepath.Ext(file.Filename))
+		err = session.Advanced().Attachments().Store(&newItem, file.Filename, fileStream, mimeType)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store attachment"})
+			return
+		}
 	}
 
 	err = session.SaveChanges()
@@ -171,6 +192,32 @@ func (h *ItemHandler) GetItem(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
 		return
 	}
+
+	attachments, err := session.Advanced().Attachments().GetNames(item)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
+		return
+	}
+
+	attachmentData := make([]string, 0, len(attachments))
+	for _, attachment := range attachments {
+		stream, err := session.Advanced().Attachments().Get(item, attachment.Name)
+		if err != nil {
+			// continue to next attachment
+			continue
+		}
+		bytes, err := ioutil.ReadAll(stream.Data)
+		stream.Close() // Ensure the stream is closed after use
+		if err != nil {
+			// continue to next attachment
+			continue
+		}
+
+		// Encode the attachment bytes in base64 and append to the attachment data slice
+		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+		attachmentData = append(attachmentData, base64Encoded)
+	}
+	item.Attachments = attachmentData
 
 	c.JSON(http.StatusOK, gin.H{"item": item})
 }
