@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"swapper/middleware"
 	"swapper/models"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/ravendb/ravendb-go-client"
@@ -25,6 +26,7 @@ func (h *MessageHandler) RegisterMessageRoutes(r *gin.Engine) {
 	messages.POST("", middleware.AuthMiddleware(), h.PostMessage)
 }
 
+// route for sending a message
 func (h *MessageHandler) PostMessage(c *gin.Context) {
 	userID, exists := c.Get("userID")
 	if !exists {
@@ -48,6 +50,7 @@ func (h *MessageHandler) PostMessage(c *gin.Context) {
 		SenderID:    userID.(string),
 		RecipientID: messageReq.RecipientID,
 		Text:        messageReq.Text,
+		SentAt:      time.Now(), //set sent at time to current time
 	}
 
 	session, err := h.Store.OpenSession("")
