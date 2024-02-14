@@ -1,7 +1,9 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"strconv"
 	"swapper/middleware"
 	"swapper/models"
 	"time"
@@ -73,4 +75,33 @@ func (h *MessageHandler) PostMessage(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Message sent successfully", "id": newMessage.RecipientID})
+}
+
+// route to get all user conversations for messages landing page
+// TO DO: Define conversation header model
+func (h *MessageHandler) GetUserConversations(c *gin.Context) {
+	userID := c.Param("userID")
+	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var conversations []*models.Message
+	//to do: query for distinct conversations
+	q := session.QueryCollection("messages")
+	q = q.WhereEquals("senderID", userID).OrElse().WhereEquals("recipientID", userID)
+	q = q.Take(limit)
+
+	err = q.GetResults(&conversations)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query conversations"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"conversations": conversations})
 }
