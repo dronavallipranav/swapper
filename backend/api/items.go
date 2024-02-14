@@ -143,15 +143,29 @@ url params:
 TODO:
 */
 func (h *ItemHandler) GetItems(c *gin.Context) {
-	//lat := c.Query("lat")
-	//long := c.Query("long")
-	//radius := c.DefaultQuery("radius", "25")
-	//categories := c.QueryArray("categories")
-	//status := c.Query("status")
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
-	//sort := c.DefaultQuery("sort", "title")
-	//order := c.DefaultQuery("order", "asc")
-	//search := c.Query("search")
+	lat, err := strconv.ParseFloat(c.Query("lat"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid latitude"})
+		return
+	}
+
+	long, err := strconv.ParseFloat(c.Query("long"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid longitude"})
+		return
+	}
+
+	radius, err := strconv.ParseFloat(c.DefaultQuery("radius", "10"), 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid longitude"})
+		return
+	}
+
+	limit, err := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid limit"})
+		return
+	}
 
 	session, err := h.Store.OpenSession("")
 	if err != nil {
@@ -161,8 +175,8 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	defer session.Close()
 
 	var items []*models.Item
-	q := session.QueryCollection("items")
-	//q = q.WithinRadiusOf("Coordinates", 250000, -74.0060, 40.7128)
+	q := session.QueryIndex("items/ByLocation")
+	q = q.WithinRadiusOf("coordinates", radius, lat, long)
 	q = q.Take(limit)
 
 	err = q.GetResults(&items)
