@@ -186,6 +186,15 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 		return
 	}
 
+	// attach the first image to each item
+	for _, item := range items {
+		attachmentData, err := getItemAttachments(c, 1, item, session)
+		if err != nil {
+			return // error is already added to gin context
+		}
+		item.Attachments = attachmentData
+	}
+
 	c.JSON(http.StatusOK, gin.H{"items": items})
 }
 
@@ -207,29 +216,9 @@ func (h *ItemHandler) GetItem(c *gin.Context) {
 		return
 	}
 
-	attachments, err := session.Advanced().Attachments().GetNames(item)
+	attachmentData, err := getItemAttachments(c, -1, item, session)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
-		return
-	}
-
-	attachmentData := make([]string, 0, len(attachments))
-	for _, attachment := range attachments {
-		stream, err := session.Advanced().Attachments().Get(item, attachment.Name)
-		if err != nil {
-			// continue to next attachment
-			continue
-		}
-		bytes, err := io.ReadAll(stream.Data)
-		stream.Close() // Ensure the stream is closed after use
-		if err != nil {
-			// continue to next attachment
-			continue
-		}
-
-		// Encode the attachment bytes in base64 and append to the attachment data slice
-		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
-		attachmentData = append(attachmentData, base64Encoded)
+		return // error is already added to gin context
 	}
 	item.Attachments = attachmentData
 
@@ -278,4 +267,41 @@ func (h *ItemHandler) DeleteItem(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Item deleted"})
+}
+
+/*
+  Helpers
+*/
+
+func getItemAttachments(c *gin.Context, count int, item *models.Item, session *ravendb.DocumentSession) ([]string, error) {
+	attachments, err := session.Advanced().Attachments().GetNames(item)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
+		return nil, err
+	}
+
+	max := count
+	if count == -1 || count > len(attachments) {
+		max = len(attachments)
+	}
+
+	attachmentData := make([]string, 0, len(attachments))
+	for i, attachment := range attachments {
+		if i == max {
+			break
+		}
+		stream, err := session.Advanced().Attachments().Get(item, attachment.Name)
+		if err != nil {
+			continue
+		}
+		bytes, err := io.ReadAll(stream.Data)
+		stream.Close()
+		if err != nil {
+			continue
+		}
+
+		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+		attachmentData = append(attachmentData, base64Encoded)
+	}
+	return attachmentData, nil
 }
