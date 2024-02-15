@@ -1,10 +1,15 @@
 package api
 
 import (
+	"encoding/base64"
 	"fmt"
+	"io"
+	"mime"
 	"net/http"
 	"os"
+	"path/filepath"
 	"reflect"
+	"swapper/middleware"
 	"swapper/models"
 	"time"
 
@@ -27,6 +32,8 @@ func NewUserHandler(store *ravendb.DocumentStore) *UserHandler {
 func (h *UserHandler) RegisterUserRoutes(r *gin.Engine) {
 	r.POST("/signup", h.SignUp)
 	r.POST("/login", h.LoginUser)
+	r.PUT("/user", middleware.AuthMiddleware(), h.UpdateUser)
+	r.GET("/users/:id", h.GetUser)
 }
 
 type SignUpRequest struct {
@@ -180,4 +187,185 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"token": jwt})
+}
+
+type UpdateUserRequest struct {
+	Name     string `form:"name"`
+	Email    string `form:"email"`
+	Password string `form:"password"`
+}
+
+func (h *UserHandler) UpdateUser(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	if err := c.Request.ParseMultipartForm(32 << 20); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse multipart form"})
+		return
+	}
+
+	var updateUserReq UpdateUserRequest
+	if err := c.ShouldBind(&updateUserReq); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
+		return
+	}
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	// load current user model
+	var u *models.User
+	err = session.Load(&u, userID.(string))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load user"})
+		return
+	}
+
+	if updateUserReq.Name != "" {
+		u.Name = updateUserReq.Name
+	}
+
+	if updateUserReq.Email != "" {
+		u.Email = updateUserReq.Email
+	}
+
+	if updateUserReq.Password != "" {
+		hash, err := bcrypt.GenerateFromPassword([]byte(updateUserReq.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+			return
+		}
+		u.PasswordHash = string(hash)
+	}
+
+	err = session.Store(u)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store user"})
+		return
+	}
+
+	err = session.SaveChanges()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
+		return
+	}
+
+	form, _ := c.MultipartForm()
+	files := form.File["profilePicture"]
+
+	if len(files) > 0 {
+		file := files[0]
+		fileStream, err := file.Open()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
+			return
+		}
+		defer fileStream.Close()
+
+		mimeType := mime.TypeByExtension(filepath.Ext(file.Filename))
+		err = session.Advanced().Attachments().Store(u, file.Filename, fileStream, mimeType)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store attachment"})
+			return
+		}
+
+		// read attachment
+		attachments, err := session.Advanced().Attachments().GetNames(u)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
+			return
+		}
+
+		if len(attachments) == 0 {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "No attachments found"})
+			return
+		}
+
+		attachment := attachments[0]
+		stream, err := session.Advanced().Attachments().Get(u, attachment.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment"})
+			return
+		}
+		bytes, err := io.ReadAll(stream.Data)
+		stream.Close()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read attachment"})
+			return
+		}
+
+		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+		u.ProfilePicture = base64Encoded
+
+	}
+
+	err = session.SaveChanges()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
+		return
+	}
+
+	u.PasswordHash = ""
+
+	c.JSON(http.StatusOK, gin.H{"user": u})
+}
+
+func (h *UserHandler) GetUser(c *gin.Context) {
+	userID := "users/" + c.Param("id")
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var u *models.User
+	err = session.Load(&u, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load user"})
+		return
+	}
+
+	if u == nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		return
+	}
+
+	// read attachments
+	attachments, err := session.Advanced().Attachments().GetNames(u)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
+		return
+	}
+
+	if len(attachments) > 0 {
+		attachment := attachments[0]
+		stream, err := session.Advanced().Attachments().Get(u, attachment.Name)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment"})
+			return
+		}
+		bytes, err := io.ReadAll(stream.Data)
+		stream.Close()
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read attachment"})
+			return
+		}
+
+		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+		u.ProfilePicture = base64Encoded
+	}
+
+	u.PasswordHash = ""
+	c.JSON(http.StatusOK, gin.H{"user": u})
 }

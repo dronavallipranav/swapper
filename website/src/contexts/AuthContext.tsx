@@ -1,5 +1,5 @@
 import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { isAuth, logout } from '../services/AuthService';
+import { getUser, isAuth, logout } from '../services/AuthService';
 import { User } from '../models/User';
 
 type AuthContextType = {
@@ -28,6 +28,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const loginUser = (user: User) => {
     setUser(user);
+    getUser(user.id).then((u) => {
+      setUser(u); // this is to retrieve additional information like user pfp
+    })
     setIsAuthenticated(true);
   };
 

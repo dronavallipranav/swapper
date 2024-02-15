@@ -5,6 +5,8 @@ import Footer from "./components/Footer";
 import ItemPage from "./pages/Items/ItemPage";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
+import ProfileSettings from "./pages/profile/ProfileSettings";
+
 import MessagePage from "./pages/MessagePage";
 
 import LogoutPage from "./pages/LogoutPage";
@@ -49,6 +51,16 @@ function App() {
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/logout" element={<LogoutPage />} />
+
+              {/* Profile Routes */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute>
+                    <ProfileSettings />
+                  </ProtectedRoute>
+                }
+              />
             </Routes>
           </BrowserRouter>
         </AuthProvider>

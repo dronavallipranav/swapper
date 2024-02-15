@@ -109,6 +109,7 @@ export const NewItemPage = () => {
               value={categories}
               onChange={(e) => setCategories(e.target.value)}
               className="w-full px-4 py-2 mt-2 border rounded-md"
+              required
             />
           </div>
 
@@ -127,6 +128,7 @@ export const NewItemPage = () => {
                 }
               }}
               className="w-full px-4 py-2 mt-2 border rounded-md"
+              required
             />
           </div>
 
