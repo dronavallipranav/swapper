@@ -55,3 +55,33 @@ export const logout = () => {
 export const isAuth = (): boolean => {
   return Boolean(localStorage.getItem('token'));
 };
+
+export const updateUser = async (formData: FormData): Promise<User> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await api.put<{ user: User }>('/user', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const user = response.data.user;
+      localStorage.setItem('user', JSON.stringify(user));
+      resolve(user);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+export const getUser = async (id: string): Promise<User> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const response = await api.get<{ user: User }>(id);
+      const user = response.data.user;
+      localStorage.setItem('user', JSON.stringify(user));
+      resolve(user);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
