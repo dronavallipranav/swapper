@@ -233,6 +233,31 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	}
 
 	if updateUserReq.Email != "" {
+		// check for other users with the same email
+		tp := reflect.TypeOf(&models.User{})
+		q := session.QueryCollectionForType(tp)
+		q = q.WhereEquals("email", updateUserReq.Email).Take(1)
+
+		var users []*models.User
+		err = q.GetResults(&users)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query user"})
+			return
+		}
+
+		if len(users) > 0 {
+			// if the first user is the one making the request it's ok, if it isnt its abd
+			if len(users) == 1 {
+				if users[0].ID != u.ID {
+					c.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
+					return
+				}
+			} else {
+				c.JSON(http.StatusConflict, gin.H{"error": "Email already exists"})
+				return
+			}
+		}
+
 		u.Email = updateUserReq.Email
 	}
 
