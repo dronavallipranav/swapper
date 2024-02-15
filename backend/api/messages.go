@@ -3,7 +3,7 @@ package api
 import (
 	"fmt"
 	"net/http"
-	"strconv"
+	"sort"
 	"swapper/middleware"
 	"swapper/models"
 	"time"
@@ -26,6 +26,7 @@ func (h *MessageHandler) RegisterMessageRoutes(r *gin.Engine) {
 	messages := r.Group("/messages")
 	// Use auth middleware for all messages routes
 	messages.POST("", middleware.AuthMiddleware(), h.PostMessage)
+	messages.GET("", middleware.AuthMiddleware(), h.GetUserConversations)
 }
 
 // route for sending a message
@@ -80,8 +81,12 @@ func (h *MessageHandler) PostMessage(c *gin.Context) {
 // route to get all user conversations for messages landing page
 // TO DO: Define conversation header model
 func (h *MessageHandler) GetUserConversations(c *gin.Context) {
-	userID := c.Param("userID")
-	limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+	//limit, _ := strconv.Atoi(c.DefaultQuery("limit", "10"))
 
 	session, err := h.Store.OpenSession("")
 	if err != nil {
@@ -91,10 +96,10 @@ func (h *MessageHandler) GetUserConversations(c *gin.Context) {
 	defer session.Close()
 
 	var conversations []*models.Message
-	//to do: query for distinct conversations
+	//query grabs all messages where the user is the sender or recipient, and orders by sentAt
 	q := session.QueryCollection("messages")
 	q = q.WhereEquals("senderID", userID).OrElse().WhereEquals("recipientID", userID)
-	q = q.Take(limit)
+	q = q.OrderByDescending("sentAt")
 
 	err = q.GetResults(&conversations)
 	if err != nil {
@@ -103,5 +108,44 @@ func (h *MessageHandler) GetUserConversations(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"conversations": conversations})
+	//post process messages to only be the most recent message per conversation
+	mostRecentMessages := getMostRecentMessagePerConversation(conversations, userID.(string))
+
+	var filteredConversations []*models.Message
+	for _, msg := range mostRecentMessages {
+		filteredConversations = append(filteredConversations, msg)
+	}
+
+	//return filtered conversations array
+	c.JSON(http.StatusOK, gin.H{"conversations": filteredConversations})
+}
+
+// post-processing helper to filter out only the most recent message per conversation
+func getMostRecentMessagePerConversation(conversations []*models.Message, userID string) map[string]*models.Message {
+	//use a map to track the most recent message for each conversation
+	mostRecentMessages := make(map[string]*models.Message)
+
+	for _, msg := range conversations {
+		otherParticipant := msg.SenderID
+		if msg.SenderID == userID {
+			otherParticipant = msg.RecipientID
+		}
+
+		//create a sorted slice of the participant IDs to generate a consistent key
+		participants := []string{userID, otherParticipant}
+		sort.Strings(participants)
+		convoKey := fmt.Sprintf("%s-%s", participants[0], participants[1])
+
+		//check to see if message already exists for this conversation
+		if existingMsg, exists := mostRecentMessages[convoKey]; exists {
+			//update if message is more recent
+			if msg.SentAt.After(existingMsg.SentAt) {
+				mostRecentMessages[convoKey] = msg
+			}
+		} else {
+			mostRecentMessages[convoKey] = msg
+		}
+	}
+
+	return mostRecentMessages
 }

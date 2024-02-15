@@ -17,7 +17,7 @@ func geographySpatialOptions() *ravendb.SpatialOptions {
 	}
 }
 
-func NewMyIndex() *ravendb.IndexCreationTask {
+func NewSpatialIndex() *ravendb.IndexCreationTask {
 	res := ravendb.NewIndexCreationTask("items/ByLocation")
 	res.Map = "docs.items.Select(item => new {\n" +
 		"    item = item\n" +
