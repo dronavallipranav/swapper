@@ -20,14 +20,14 @@ function HomePage() {
     fetchAllItems({
       latitude: 43.0731, // Default to Madison, WI latitude
       longitude: -89.4012, // Default to Madison, WI longitude
-      radius: 10, // Example radius in miles
+      radius: 10000000, // Example radius in miles
       categories: [], // Example category to filter by
-      status: 'available', // Example status to filter by
+      status: "available", // Example status to filter by
       limit: 500, // Optional: Default number of items to return
       skip: 0, // Optional: Default number of items to skip
-      sort: 'title', // Optional: Default field to sort by
-      order: 'asc', // Optional: Default sort order
-      search: '', // Optional: Default search term, empty means no search filter
+      sort: "title", // Optional: Default field to sort by
+      order: "asc", // Optional: Default sort order
+      search: "", // Optional: Default search term, empty means no search filter
     })
       .then((items) => {
         console.log(items);
@@ -48,48 +48,58 @@ function HomePage() {
         other.
       </p>
 
-      <div className="mb-10">
-        <div className="flex justify-center">
-          <input
-            type="text"
-            placeholder="Search for items or categories..."
-            className="input input-bordered input-lg w-full max-w-xs mx-auto"
-          />
-        </div>
-        <div className="tabs tabs-boxed justify-center my-4">
-          {categories.map((category) => (
-            <a
-              key={category}
-              className={`tab ${
-                selectedCategory === category ? "tab-active" : ""
-              }`}
-              onClick={() => setSelectedCategory(category)}
-            >
-              {category}
-            </a>
-          ))}
-          <a
-            className={`tab ${selectedCategory === null ? "tab-active" : ""}`}
-            onClick={() => setSelectedCategory(null)}
-          >
-            All
-          </a>
-        </div>
+      <div className="flex justify-center mb-10">
+        <input
+          type="text"
+          placeholder="Search for items or categories..."
+          className="input input-bordered input-lg w-full max-w-md" // Adjusted max width for better centering
+        />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="tabs tabs-boxed justify-center my-4">
+        {categories.map((category) => (
+          <a
+            key={category}
+            className={`tab ${
+              selectedCategory === category ? "tab-active" : ""
+            }`}
+            onClick={() => setSelectedCategory(category)}
+          >
+            {category}
+          </a>
+        ))}
+        <a
+          className={`tab ${selectedCategory === null ? "tab-active" : ""}`}
+          onClick={() => setSelectedCategory(null)}
+        >
+          All
+        </a>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 justify-items-center">
+        {" "}
+        {/* Ensure items are centered */}
         {items &&
           items.map((item) => (
-            <div key={item.id} className="card w-72 bg-base-100 shadow-xl">
-              {/*item.imageUrl && (
+            <div
+              key={item.id}
+              className="card card-compact w-full md:w-80 bg-base-100 shadow-xl"
+            >
+              {" "}
+              {/* Adjusted width for responsive design */}
+              {item.attachments && item.attachments[0] && (
                 <figure>
-                  <img src={item.imageUrl} alt="Item" className="rounded-xl" />
+                  <img
+                    src={`data:image/png;base64,${item.attachments[0]}`}
+                    alt="Item"
+                    className="rounded-xl"
+                  />
                 </figure>
-              )*/}
-              <div className="card-body items-center text-center">
+              )}
+              <div className="card-body">
                 <h2 className="card-title">{item.title}</h2>
                 <p>{item.description}</p>
-                <div className="card-actions">
+                <div className="card-actions justify-end">
                   <button
                     className="btn btn-primary"
                     onClick={() => {
