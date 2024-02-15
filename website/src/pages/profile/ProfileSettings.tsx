@@ -9,6 +9,7 @@ const ProfileSettings = () => {
   const [email, setEmail] = useState('');
   const [profileImage, setProfileImage] = useState<string | File>();
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState(false);
   const nav = useNavigate();
 
   useEffect(() => {
@@ -27,6 +28,7 @@ const ProfileSettings = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSuccess(false);
 
     const user = {
       name,
@@ -46,7 +48,7 @@ const ProfileSettings = () => {
       .then((u) => {
         setError("");
         loginUser(u);
-        nav('/profile')
+        setSuccess(true);
       })
       .catch((e) => {
         if (e.response.data.error) {
@@ -61,6 +63,7 @@ const ProfileSettings = () => {
     <div className="container mx-auto px-4 py-10">
       <h1 className="text-2xl font-semibold mb-4">Profile Settings</h1>
       {error && <div className="alert alert-error">{error}</div>}
+      {success && <div className="alert alert-success">Profile updated successfully</div>}
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="form-control">
           <label className="label" htmlFor="name">
