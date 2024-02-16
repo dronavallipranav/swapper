@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { createItem } from "../../services/ItemService";
 import { useNavigate } from "react-router-dom";
 
@@ -11,6 +11,18 @@ export const NewItemPage = () => {
   const [error, setError] = useState("");
   const nav = useNavigate();
   const [images, setImages] = useState<File[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setImages([...images, e.target.files[0]]);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -120,16 +132,34 @@ export const NewItemPage = () => {
             <input
               type="file"
               id="images"
-              multiple
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                if (e.target.files) {
-                  const filesArray: File[] = Array.from(e.target.files);
-                  setImages(filesArray);
-                }
-              }}
-              className="w-full px-4 py-2 mt-2 border rounded-md"
-              required
+              ref={fileInputRef}
+              onChange={handleAddImage}
+              className="w-full px-4 py-2 mt-2 border rounded-md hidden"
             />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+            >
+              Add Another Image
+            </button>
+          </div>
+
+
+          <div className="mt-4">
+            <label className="block">Uploaded Images</label>
+            {images.map((file, index) => (
+              <div key={index} className="flex items-center mt-2">
+                <span className="mr-2">{file.name}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveImage(index)}
+                  className="px-2 py-1 text-white bg-red-500 rounded-md hover:bg-red-700"
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
           </div>
 
           <div className="flex justify-end mt-6">
