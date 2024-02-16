@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Item } from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
+import CitySearchComponent from "../components/CitySearch";
+import LocationService, { Location } from "../services/LocationService";
 
 const categories = [
   "Electronics",
@@ -15,13 +17,17 @@ const categories = [
 function HomePage() {
   const [items, setItems] = useState<Item[] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedRadius, setSelectedRadius] = useState<number>(10);
+  const [location, setLocation] = useState<Location>();
 
   useEffect(() => {
-    const selectedCategories = selectedCategory !== "All" ? [selectedCategory] : [];
+    const selectedCategories =
+      selectedCategory !== "All" ? [selectedCategory] : [];
+
     fetchAllItems({
-      latitude: 43.0731, // Default to Madison, WI latitude
-      longitude: -89.4012, // Default to Madison, WI longitude
-      radius: 100000, // Example radius in miles
+      latitude: location?.latitude || 43.0731, // Default to Madison, WI latitude
+      longitude: location?.longitude || -89.4012, // Default to Madison, WI longitude
+      radius: selectedRadius,
       categories: [], // Example category to filter by
       status: "available", // Example status to filter by
       limit: 500, // Optional: Default number of items to return
@@ -37,18 +43,39 @@ function HomePage() {
       .catch((error) => {
         console.error(error); // Handle potential errors
       });
-  }, [selectedCategory]); // React to changes in selectedCategory
+  }, [selectedCategory, selectedRadius, location]); // React to changes in selectedCategory
 
-  const handleCategoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+  const handleCategoryChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
     setSelectedCategory(event.target.value);
   };
 
   return (
     <div className="container mx-auto px-4 py-10">
-      <h1 className="text-4xl font-bold text-center mb-6">Community Marketplace</h1>
+      <h1 className="text-4xl font-bold text-center mb-6">
+        Community Marketplace
+      </h1>
       <p className="text-lg text-center mb-8">
-        A place to give and find free items, reducing waste and helping each other.
+        A place to give and find free items, reducing waste and helping each
+        other.
       </p>
+
+      <CitySearchComponent messageText="Enter a city:" storeLocation={true} onChange={(l: Location): void => {setLocation(l)}} />
+
+      {/* Radius input */}
+      <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4">
+        <label className="label">
+          <span className="label-text">Search Radius (miles):</span>
+        </label>
+        <input
+          type="number"
+          value={selectedRadius}
+          onChange={(e) => setSelectedRadius(Number(e.target.value))}
+          className="input input-bordered w-full max-w-xs"
+          min="1"
+        />
+      </div>
 
       {/* Search and category selection */}
       <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4">
@@ -63,14 +90,18 @@ function HomePage() {
             {categories.map((category) => (
               <a
                 key={category}
-                className={`tab ${selectedCategory === category ? "tab-active" : ""}`}
+                className={`tab ${
+                  selectedCategory === category ? "tab-active" : ""
+                }`}
                 onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </a>
             ))}
             <a
-              className={`tab ${selectedCategory === "All" ? "tab-active" : ""}`}
+              className={`tab ${
+                selectedCategory === "All" ? "tab-active" : ""
+              }`}
               onClick={() => setSelectedCategory("All")}
             >
               All
@@ -95,24 +126,37 @@ function HomePage() {
 
       {/* Items grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">
-        {items && items.map((item) => (
-          <div key={item.id} className="card card-compact w-full md:w-80 bg-base-100 shadow-xl">
-            {item.attachments && item.attachments[0] && (
-              <figure>
-                <img src={`${item.attachments[0]}`} alt="Item" className="rounded-xl" />
-              </figure>
-            )}
-            <div className="card-body">
-              <h2 className="card-title">{item.title}</h2>
-              <p>{item.description}</p>
-              <div className="card-actions justify-end">
-                <button className="btn btn-primary" onClick={() => { window.location.href = `/${item.id}`; }}>
-                  View Item
-                </button>
+        {items &&
+          items.map((item) => (
+            <div
+              key={item.id}
+              className="card card-compact w-full md:w-75 bg-base-100 shadow-xl"
+            >
+              {item.attachments && item.attachments[0] && (
+                <figure>
+                  <img
+                    src={`${item.attachments[0]}`}
+                    alt="Item"
+                    className="rounded-xl"
+                  />
+                </figure>
+              )}
+              <div className="card-body">
+                <h2 className="card-title">{item.title}</h2>
+                <p>{item.description}</p>
+                <div className="card-actions justify-end">
+                  <button
+                    className="btn btn-primary"
+                    onClick={() => {
+                      window.location.href = `/${item.id}`;
+                    }}
+                  >
+                    View Item
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

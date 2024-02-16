@@ -28,22 +28,14 @@ api.interceptors.request.use(
 );
 
 // Response interceptor for API calls
-/*api.interceptors.response.use(
+api.interceptors.response.use(
   response => response,
   error => {
-    if (!error.response) {
-      eventEmitter.emit('apiError', 'Could not connect to server. Please try again later.');
-    }
-    if (error.response && error.response.data && error.response.data.error) {
-      // Emit a custom event with the error message
-      eventEmitter.emit('apiError', error.response.data.error);
-    } 
     if (error.response && error.response.status == 401) {
-      eventEmitter.emit('apiError', 'You have been logged out. Please log in again.');
       window.location.href = '/logout'; // Redirect to logout if not already on login page 
     }
     return Promise.reject(error);
   }
-);*/
+);
 
 export default api;

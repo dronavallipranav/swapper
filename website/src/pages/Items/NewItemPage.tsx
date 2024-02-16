@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import { createItem } from "../../services/ItemService";
 import { useNavigate } from "react-router-dom";
+import { Location } from "../../services/LocationService";
+import CitySearchComponent from "../../components/CitySearch";
 
 export const NewItemPage = () => {
   const [title, setTitle] = useState("");
@@ -12,11 +14,12 @@ export const NewItemPage = () => {
   const nav = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [itemLocation, setItemLocation] = useState<Location>();
 
   const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       setImages([...images, e.target.files[0]]);
-      e.target.value = '';
+      e.target.value = "";
     }
   };
 
@@ -42,6 +45,9 @@ export const NewItemPage = () => {
     formData.append("title", item.title);
     formData.append("description", item.description);
     formData.append("quantity", item.quantity.toString());
+    if (itemLocation) {
+      formData.append("location", JSON.stringify(itemLocation));
+    }
     if (item.categories) {
       item.categories.forEach((category) =>
         formData.append("categories[]", category)
@@ -49,7 +55,7 @@ export const NewItemPage = () => {
     }
     formData.append("status", item.status);
     Array.from(images || []).forEach((file) => {
-      formData.append("images", file); 
+      formData.append("images", file);
     });
 
     createItem(formData)
@@ -139,13 +145,14 @@ export const NewItemPage = () => {
             />
             <button
               type="button"
-              onClick={() => fileInputRef.current && fileInputRef.current.click()}
+              onClick={() =>
+                fileInputRef.current && fileInputRef.current.click()
+              }
               className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
             >
               Add Another Image
             </button>
           </div>
-
 
           <div className="mt-4">
             <label className="block">Uploaded Images</label>
@@ -161,6 +168,20 @@ export const NewItemPage = () => {
                 </button>
               </div>
             ))}
+          </div>
+
+          {/* where the item is */}
+          <div className="mt-4">
+            <label htmlFor="location" className="block">
+              Location of Item
+            </label>
+
+            <CitySearchComponent
+              messageText=""
+              onChange={(l: Location): void => {
+                setItemLocation(l);
+              }}
+            />
           </div>
 
           <div className="flex justify-end mt-6">
