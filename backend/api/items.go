@@ -88,6 +88,15 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 	form, _ := c.MultipartForm()
 	files := form.File["images"]
 
+	// Filter down files if not jpg, png, or jpeg
+	for _, file := range files {
+		ext := filepath.Ext(file.Filename)
+		if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Only jpg, png, and jpeg files are allowed"})
+			return
+		}
+	}
+
 	// Require at least 1 image
 	if len(files) == 0 {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "At least 1 image is required"})
@@ -308,6 +317,10 @@ func getItemAttachments(c *gin.Context, count int, item *models.Item, session *r
 		}
 
 		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+
+		// add front mimetype to base64 string
+		base64Encoded = fmt.Sprintf("data:%s;base64,%s", stream.Details.ContentType, base64Encoded)
+
 		attachmentData = append(attachmentData, base64Encoded)
 	}
 	return attachmentData, nil

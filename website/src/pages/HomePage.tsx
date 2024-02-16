@@ -99,7 +99,7 @@ function HomePage() {
           <div key={item.id} className="card card-compact w-full md:w-80 bg-base-100 shadow-xl">
             {item.attachments && item.attachments[0] && (
               <figure>
-                <img src={`data:image/png;base64,${item.attachments[0]}`} alt="Item" className="rounded-xl" />
+                <img src={`${item.attachments[0]}`} alt="Item" className="rounded-xl" />
               </figure>
             )}
             <div className="card-body">
