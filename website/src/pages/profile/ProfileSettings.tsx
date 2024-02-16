@@ -102,6 +102,7 @@ const ProfileSettings = () => {
             type="file"
             className="input input-bordered"
             onChange={handleImageChange}
+            accept="image/png, image/jpeg, image/jpg"
           />
         </div>
         <div className="form-control mt-6">

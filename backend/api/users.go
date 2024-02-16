@@ -288,6 +288,13 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	if len(files) > 0 {
 		file := files[0]
+
+		ext := filepath.Ext(file.Filename)
+		if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Only jpg, png, and jpeg files are allowed"})
+			return
+		}
+
 		fileStream, err := file.Open()
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open file"})
@@ -329,6 +336,10 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		}
 
 		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+
+		// add front mimetype to base64 string
+		base64Encoded = fmt.Sprintf("data:%s;base64,%s", stream.Details.ContentType, base64Encoded)
+
 		u.ProfilePicture = base64Encoded
 
 	}
@@ -388,6 +399,10 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 		}
 
 		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
+
+		// add front mimetype to base64 string
+		base64Encoded = fmt.Sprintf("data:%s;base64,%s", stream.Details.ContentType, base64Encoded)
+
 		u.ProfilePicture = base64Encoded
 	}
 

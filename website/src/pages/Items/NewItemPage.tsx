@@ -135,6 +135,7 @@ export const NewItemPage = () => {
               ref={fileInputRef}
               onChange={handleAddImage}
               className="w-full px-4 py-2 mt-2 border rounded-md hidden"
+              accept="image/png, image/jpeg, image/jpg"
             />
             <button
               type="button"

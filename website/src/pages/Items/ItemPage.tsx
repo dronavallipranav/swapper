@@ -56,7 +56,7 @@ const ItemPage = () => {
                     className="carousel-item relative w-full"
                   >
                     <img
-                      src={`data:image/png;base64,${base64EncodedImage}`}
+                      src={`${base64EncodedImage}`}
                       alt={`Attachment ${index}`}
                       className="rounded-box"
                     />
