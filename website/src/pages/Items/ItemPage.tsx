@@ -60,7 +60,7 @@ const ItemPage = () => {
                       alt={`Attachment ${index}`}
                       className="rounded-box"
                     />
-                    <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                    {item?.attachments?.length && item?.attachments?.length > 1 && <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
                       <a
                         href={
                           `#slide` +
@@ -83,7 +83,7 @@ const ItemPage = () => {
                       >
                         ❯
                       </a>
-                    </div>
+                    </div>}
                   </div>
                 ))}
             </div>
