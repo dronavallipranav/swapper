@@ -85,6 +85,15 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 	}
 	defer session.Close()
 
+	form, _ := c.MultipartForm()
+	files := form.File["images"]
+
+	// Require at least 1 image
+	if len(files) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "At least 1 image is required"})
+		return
+	}
+
 	err = session.Store(&newItem)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store item"})
@@ -97,8 +106,6 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		return
 	}
 
-	form, _ := c.MultipartForm()
-	files := form.File["images"]
 	for _, file := range files {
 		fileStream, err := file.Open()
 		if err != nil {
