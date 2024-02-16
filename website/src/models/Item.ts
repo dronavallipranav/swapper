@@ -1,3 +1,5 @@
+import { Location } from "../services/LocationService";
+
 export interface Item {
     id: string;
     userId: string;
@@ -8,4 +10,5 @@ export interface Item {
     status: string;
     images?: string[];
     attachments?: string[];
+    location?: Location
 }
