@@ -57,7 +57,7 @@ const Header = () => {
             <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
               <div className="w-10 h-10 rounded-full">
                 {user.profilePicture ? (
-                  <img src={`data:image/png;base64,${user.profilePicture}`} alt="Profile" className="rounded-full" />
+                  <img src={`${user.profilePicture}`} alt="Profile" className="rounded-full" />
                 ) : (
                   <span className="text-xl">{user.name.charAt(0).toUpperCase()}</span>
                 )}

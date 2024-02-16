@@ -1,6 +1,7 @@
 package api
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"io"
@@ -224,6 +225,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	var u *models.User
 	err = session.Load(&u, userID.(string))
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load user"})
 		return
 	}
@@ -279,16 +281,37 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 
 	err = session.SaveChanges()
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
 		return
 	}
 
 	form, _ := c.MultipartForm()
 	files := form.File["profilePicture"]
-
 	if len(files) > 0 {
-		file := files[0]
+		// ok we have a new pfp so we need to delete all existing attachments if any
+		attachments, err := session.Advanced().Attachments().GetNames(u)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
+			return
+		}
 
+		for _, attachment := range attachments {
+			err = session.Advanced().Attachments().Delete(u, attachment.Name)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete attachment"})
+				return
+			}
+		}
+
+		err = session.SaveChanges()
+		if err != nil {
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
+			return
+		}
+
+		file := files[0]
 		ext := filepath.Ext(file.Filename)
 		if ext != ".jpg" && ext != ".png" && ext != ".jpeg" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Only jpg, png, and jpeg files are allowed"})
@@ -302,52 +325,39 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		}
 		defer fileStream.Close()
 
-		mimeType := mime.TypeByExtension(filepath.Ext(file.Filename))
-		err = session.Advanced().Attachments().Store(u, file.Filename, fileStream, mimeType)
+		fileBytes, err := io.ReadAll(fileStream)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read file"})
+			return
+		}
+		fileStream.Close() // Ensure the file is closed after reading
+
+		// Prepare the base64Encoded string
+		contentType := http.DetectContentType(fileBytes)
+		base64Encoded := base64.StdEncoding.EncodeToString(fileBytes)
+		base64Encoded = fmt.Sprintf("data:%s;base64,%s", contentType, base64Encoded)
+
+		// Now, convert fileBytes back into a stream for the .Store method
+		byteReader := bytes.NewReader(fileBytes)
+		mimeType := mime.TypeByExtension(ext) // This was determined from the file extension earlier
+
+		// Store the byteReader as an attachment
+		err = session.Advanced().Attachments().Store(u, file.Filename, byteReader, mimeType)
 		if err != nil {
 			fmt.Println(err.Error())
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store attachment"})
 			return
 		}
 
-		// read attachment
-		attachments, err := session.Advanced().Attachments().GetNames(u)
+		// Proceed to save changes
+		err = session.SaveChanges()
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
 			return
 		}
-
-		if len(attachments) == 0 {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "No attachments found"})
-			return
-		}
-
-		attachment := attachments[0]
-		stream, err := session.Advanced().Attachments().Get(u, attachment.Name)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment"})
-			return
-		}
-		bytes, err := io.ReadAll(stream.Data)
-		stream.Close()
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to read attachment"})
-			return
-		}
-
-		base64Encoded := base64.StdEncoding.EncodeToString(bytes)
-
-		// add front mimetype to base64 string
-		base64Encoded = fmt.Sprintf("data:%s;base64,%s", stream.Details.ContentType, base64Encoded)
 
 		u.ProfilePicture = base64Encoded
-
-	}
-
-	err = session.SaveChanges()
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to save changes"})
-		return
 	}
 
 	u.PasswordHash = ""
@@ -368,6 +378,7 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	var u *models.User
 	err = session.Load(&u, userID)
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to load user"})
 		return
 	}
