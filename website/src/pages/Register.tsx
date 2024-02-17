@@ -6,6 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
   const [name, setName] = useState<string>('');
   const [error, setError] = useState<string>('');
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ const RegisterPage: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    register(email, password, name).then((user) => {
+    register(username, email, password, name).then((user) => {
         loginUser(user);
         navigate('/'); // Redirect to the home page after successful registration
     }).catch((e) => {
@@ -38,6 +39,15 @@ const RegisterPage: React.FC = () => {
                    id="name" 
                    value={name} 
                    onChange={(e) => setName(e.target.value)} 
+                   required />
+          </div>
+          <div>
+            <label className="block" htmlFor="name">Username</label>
+            <input type="text" placeholder="Name" 
+                   className="w-full px-4 py-2 mt-2 border rounded-md" 
+                   id="name" 
+                   value={username} 
+                   onChange={(e) => setUsername(e.target.value)} 
                    required />
           </div>
           <div className="mt-4">
