@@ -40,6 +40,7 @@ func (h *UserHandler) RegisterUserRoutes(r *gin.Engine) {
 type SignUpRequest struct {
 	Name     string `json:"name" binding:"required"`
 	Email    string `json:"email" binding:"required,email"`
+	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 
@@ -61,6 +62,7 @@ func (h *UserHandler) SignUp(c *gin.Context) {
 	newUser := models.User{
 		Name:         signUpReq.Name,
 		Email:        signUpReq.Email,
+		Username:     signUpReq.Username,
 		PasswordHash: string(hash),
 	}
 
@@ -175,10 +177,11 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":    user.ID,
-		"email": user.Email,
-		"name":  user.Name,
-		"exp":   time.Now().Add(time.Hour * 72).Unix(),
+		"id":       user.ID,
+		"email":    user.Email,
+		"username": user.Username,
+		"name":     user.Name,
+		"exp":      time.Now().Add(time.Hour * 72).Unix(),
 	})
 
 	jwt, err := token.SignedString(jwtSecret)
@@ -192,6 +195,7 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 
 type UpdateUserRequest struct {
 	Name     string `form:"name"`
+	Username string `form:"username"`
 	Email    string `form:"email"`
 	Password string `form:"password"`
 }
@@ -263,6 +267,35 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 		u.Email = updateUserReq.Email
 	}
 
+	if updateUserReq.Username != "" {
+		// check for other users with the same username
+		tp := reflect.TypeOf(&models.User{})
+		q := session.QueryCollectionForType(tp)
+		q = q.WhereEquals("username", updateUserReq.Username).Take(1)
+
+		var users []*models.User
+		err = q.GetResults(&users)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query user"})
+			return
+		}
+
+		if len(users) > 0 {
+			// if the first user is the one making the request it's ok, if it isnt its abd
+			if len(users) == 1 {
+				if users[0].ID != u.ID {
+					c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+					return
+				}
+			} else {
+				c.JSON(http.StatusConflict, gin.H{"error": "Username already exists"})
+				return
+			}
+		}
+
+		u.Username = updateUserReq.Username
+	}
+
 	if updateUserReq.Password != "" {
 		hash, err := bcrypt.GenerateFromPassword([]byte(updateUserReq.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -289,7 +322,7 @@ func (h *UserHandler) UpdateUser(c *gin.Context) {
 	form, _ := c.MultipartForm()
 	files := form.File["profilePicture"]
 	if len(files) > 0 {
-		// ok we have a new pfp so we need to delete all existing attachments if any
+		// ok we have a new pfp so we need to delete all existing attachments if any hi david
 		attachments, err := session.Advanced().Attachments().GetNames(u)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to get attachment names"})

@@ -3,13 +3,14 @@ import {jwtDecode} from 'jwt-decode';
 import { User } from "../models/User";
 
 export const register = async (
+    username: string,
     email: string,
     password: string,
     name: string
 ): Promise<User> => {
   return new Promise(async (resolve, reject) => {
     try {
-      const response = await api.post<{ token: string }>(`/signup`, { email, password, name});
+      const response = await api.post<{ token: string }>(`/signup`, { email, username, password, name});
 
       if (response.status !== 200) {
         reject(response);
