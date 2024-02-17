@@ -26,7 +26,7 @@ func (h *MessageHandler) RegisterMessageRoutes(r *gin.Engine) {
 	messages := r.Group("/messages")
 	// Use auth middleware for all messages routes
 	messages.POST("", middleware.AuthMiddleware(), h.PostMessage)
-	messages.GET("", middleware.AuthMiddleware(), h.GetUserConversations)
+	messages.GET("/conversations", middleware.AuthMiddleware(), h.GetUserConversations)
 }
 
 // route for sending a message
