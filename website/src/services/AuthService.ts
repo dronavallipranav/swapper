@@ -78,8 +78,7 @@ export const getUser = async (id: string): Promise<User> => {
   return new Promise(async (resolve, reject) => {
     try {
       const response = await api.get<{ user: User }>(id);
-      const user = response.data.user;
-      localStorage.setItem('user', JSON.stringify(user));
+      const user = response.data.user
       resolve(user);
     } catch (error) {
       reject(error);

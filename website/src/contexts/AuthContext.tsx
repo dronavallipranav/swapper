@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const loginUser = (user: User) => {
     setUser(user);
     getUser(user.id).then((u) => {
+      localStorage.setItem('user', JSON.stringify(u));
       setUser(u); // this is to retrieve additional information like user pfp
     })
     setIsAuthenticated(true);
