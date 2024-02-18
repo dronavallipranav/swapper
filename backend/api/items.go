@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/base64"
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -10,8 +11,10 @@ import (
 	"strconv"
 	"swapper/middleware"
 	"swapper/models"
+	"swapper/utils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-playground/validator"
 	"github.com/ravendb/ravendb-go-client"
 )
 
@@ -32,14 +35,16 @@ func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 	items.GET("", h.GetItems)
 	items.GET("/:id", h.GetItem)
 	items.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteItem)
+	items.GET("/attributes", h.GetAttributes)
 }
 
 type AddItemRequest struct {
-	Title       string          `form:"title" binding:"required"`
-	Description string          `form:"description"`
-	Quantity    *int            `form:"quantity"`
-	Categories  []string        `form:"categories"`
-	Location    models.Location `form:"location"`
+	Title       string            `form:"title" valdiate:"required"`
+	Description string            `form:"description"`
+	Quantity    *int              `form:"quantity"`
+	Categories  []string          `form:"categories"`
+	Location    models.Location   `form:"location" validate:"required"`
+	Attributes  models.Attributes `form:"attributes"`
 }
 
 func (h *ItemHandler) AddItem(c *gin.Context) {
@@ -76,6 +81,18 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		Categories:  addItemReq.Categories,
 		Location:    addItemReq.Location,
 		Status:      "available",
+		Attributes:  addItemReq.Attributes,
+	}
+
+	validate := validator.New()
+	if err := validate.Struct(newItem); err != nil {
+		var ve validator.ValidationErrors
+		if errors.As(err, &ve) {
+			c.JSON(http.StatusBadRequest, gin.H{"validation error": ve.Error()})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
 	}
 
 	session, err := h.Store.OpenSession("")
@@ -105,6 +122,7 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 
 	err = session.Store(&newItem)
 	if err != nil {
+		fmt.Println(err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store item"})
 		return
 	}
@@ -324,4 +342,10 @@ func getItemAttachments(c *gin.Context, count int, item *models.Item, session *r
 		attachmentData = append(attachmentData, base64Encoded)
 	}
 	return attachmentData, nil
+}
+
+func (h *ItemHandler) GetAttributes(c *gin.Context) {
+	attributes := models.Attributes{}
+	options := utils.ExtractOneOfOptions(attributes)
+	c.JSON(http.StatusOK, gin.H{"attributes": options})
 }

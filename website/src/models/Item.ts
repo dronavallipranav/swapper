@@ -1,5 +1,16 @@
 import { Location } from "../services/LocationService";
 
+export interface Attributes {
+    condition?: string;
+    size?: string;
+    color?: string;
+    shippingOptions?: string[];
+    listingType?: string;
+    itemCategory?: string;
+    ownershipHistory?: string;
+    authenticity?: string;
+}
+
 export interface Item {
     id: string;
     userId: string;
@@ -10,5 +21,7 @@ export interface Item {
     status: string;
     images?: string[];
     attachments?: string[];
-    location?: Location
+    location?: Location;
+    attributes?: Attributes;
 }
+
