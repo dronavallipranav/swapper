@@ -2,20 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Message } from '../models/Message';
-
-const currentUserID = "users/99-A";
+import api from '../services/AxiosInterceptor';
+import { useAuth } from '../contexts/AuthContext';
 
 const MessagePanel: React.FC = () => {
+  const { user } = useAuth();
+  const currentUserID:string = user?.id as string;
   //grab the recipient's user ID from the URL
-  const { userId } = useParams<{ userId: string }>(); 
+  const { userID } = useParams<{ userID: string }>(); 
+  const userId = userID?.replace(/_/g, "/");
+  console.log(userId);
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   
   useEffect(() => {
     const fetchMessages = async () => {
       try {
-        const response = await axios.get<Message[]>(`/messages/${userId}`);
-        setMessages(response.data);
+        //fetch all messages in the conversation
+        const response = await api.get<{messages :Message[]}>(`/messages?otherUserID=${encodeURIComponent(userId as string)}`);
+        setMessages(response.data.messages);
       } catch (error) {
         console.error("Failed to load messages:", error);
       }
@@ -35,31 +40,37 @@ const MessagePanel: React.FC = () => {
     };
 
     try {
-      await axios.post('/messages/', messageToSend);
+      await api.post('/messages', messageToSend);
       setMessages([...messages, messageToSend]);
       setNewMessage("");
+      console.log(messages);
     } catch (error) {
       console.error("Failed to send message:", error);
     }
   };
 
   return (
-    <div className="message-panel">
-      {}
-      <div className="messages">
+    <div className="message-panel p-4 flex flex-col h-screen">
+      <div className="messages flex-1 overflow-y-auto flex flex-col gap-2">
         {messages.map((msg, index) => (
-          <div key={index} className="message">
+          <div
+            key={index}
+            className={`message p-2 rounded-lg max-w-md ${
+              msg.senderID === currentUserID ? 'mr-auto bg-blue-500 text-white' : 'ml-auto bg-gray-200'
+            }`}
+          >
             <p>{msg.text}</p>
           </div>
         ))}
       </div>
-      <div className="send-message-form">
+      <div className="send-message-form mt-4">
         <textarea
+          className="textarea textarea-bordered w-full mb-2"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Write a message..."
         ></textarea>
-        <button onClick={sendMessage}>Send</button>
+        <button className="btn btn-primary" onClick={sendMessage}>Send</button>
       </div>
     </div>
   );

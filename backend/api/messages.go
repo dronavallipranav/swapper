@@ -27,6 +27,7 @@ func (h *MessageHandler) RegisterMessageRoutes(r *gin.Engine) {
 	// Use auth middleware for all messages routes
 	messages.POST("", middleware.AuthMiddleware(), h.PostMessage)
 	messages.GET("/conversations", middleware.AuthMiddleware(), h.GetUserConversations)
+	messages.GET("", middleware.AuthMiddleware(), h.GetMessageHistory)
 }
 
 // route for sending a message
@@ -148,4 +149,43 @@ func getMostRecentMessagePerConversation(conversations []*models.Message, userID
 	}
 
 	return mostRecentMessages
+}
+
+// returns all messages between the current user and another user
+func (h *MessageHandler) GetMessageHistory(c *gin.Context) {
+	currentUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+		return
+	}
+
+	//other user ID is a required query parameter
+	otherUserID := c.Query("otherUserID")
+	if otherUserID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing query parameter: otherUserID"})
+		return
+	}
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var messages []*models.Message
+	//query for all messages between these users, ordered by the time
+	q := session.QueryCollection("messages")
+	q = q.WhereEquals("senderID", currentUserID).WhereEquals("recipientID", otherUserID).OrElse().
+		WhereEquals("senderID", otherUserID).WhereEquals("recipientID", currentUserID)
+	q = q.OrderBy("sentAt")
+
+	err = q.GetResults(&messages)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query messages"})
+		return
+	}
+	fmt.Println(messages)
+	c.JSON(http.StatusOK, gin.H{"messages": messages})
 }
