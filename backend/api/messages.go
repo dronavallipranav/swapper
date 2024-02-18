@@ -30,6 +30,11 @@ func (h *MessageHandler) RegisterMessageRoutes(r *gin.Engine) {
 	messages.GET("", middleware.AuthMiddleware(), h.GetMessageHistory)
 }
 
+type SendMessageReq struct {
+	RecipientID string `json:"recipientID" binding:"required"`
+	Text        string `json:"text" binding:"required"`
+}
+
 // route for sending a message
 func (h *MessageHandler) PostMessage(c *gin.Context) {
 	userID, exists := c.Get("userID")
@@ -38,15 +43,9 @@ func (h *MessageHandler) PostMessage(c *gin.Context) {
 		return
 	}
 
-	var messageReq models.Message
+	var messageReq SendMessageReq
 	if err := c.ShouldBindJSON(&messageReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request" + err.Error()})
-		return
-	}
-
-	//ensure the senderID matches the authenticated user's ID for security
-	if messageReq.SenderID != userID.(string) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "Sender ID does not match the authenticated user's ID"})
 		return
 	}
 

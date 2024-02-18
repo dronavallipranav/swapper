@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Item } from "../../models/Item";
 import { deleteItem, fetchItemById } from "../../services/ItemService";
 import { useAuth } from "../../contexts/AuthContext";
+import { sendMessage } from "../../services/MessageService";
 
 const ItemPage = () => {
   let { itemID } = useParams();
@@ -33,7 +34,19 @@ const ItemPage = () => {
 
   // Function to handle navigation
   const handleNavigate = () => {
-    nav(`/messages?userID=${encodeURIComponent(item.userId)}`);
+    sendMessage(item.userId, `Hi, I'm interested in your ${item.title}`).then((id: string) => {
+      nav(`/messages/${encodeURIComponent(id)}`);
+    }).catch((e) => {
+      if (
+        e.response &&
+        e.response.data &&
+        e.response.data.error
+      ) {
+        setError(e.response.data.error);
+        return;
+      }
+      setError("An error occurred. Please try again.");
+    })
   };
 
   return (
