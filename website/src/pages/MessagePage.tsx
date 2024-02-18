@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext'; // Adjust the import path as 
 import { Message } from "../models/Message";
 import { User } from "../models/User";
 import api from '../services/AxiosInterceptor';
+import { set } from 'lodash';
 
 const ConversationsPage: React.FC = () => {
   const { user } = useAuth();
@@ -25,10 +26,13 @@ const ConversationsPage: React.FC = () => {
           if (!acc.includes(otherUserId)) acc.push(otherUserId);
           return acc;
         }, []);
-
+        setConversations(data.conversations);
+        console.log(data);
+        console.log(conversations);
         const participantDetails: User[] = await Promise.all(
           participantIds.map(async (id) => {
-            const response = await api.get<User>(`/api/${id}`);
+            const response = await api.get<User>(`/${id}`);
+            console.log(response.data);
             return response.data;
           })
         );
@@ -62,6 +66,7 @@ const ConversationsPage: React.FC = () => {
         {conversations.map((message, index) => {
           const otherUserId = message.senderID === user?.id ? message.recipientID : message.senderID;
           const otherUser = participants[otherUserId];
+          console.log(otherUser);
           return (
             <li key={index} className="mb-2">
               <div className="flex items-center gap-2">
