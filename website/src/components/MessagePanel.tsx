@@ -56,6 +56,8 @@ const MessagePanel: React.FC = () => {
   };
 
   const shouldShowProfilePicture = (index: number) => {
+    return true;
+
     // Always show for the first message
     if (index === 0) return true;
   
@@ -74,37 +76,41 @@ const MessagePanel: React.FC = () => {
     // Show if there's a significant time gap (e.g., more than 20 minutes)
     return diffMinutes > 20;
   };
-  
 
   return (
     <div className="message-panel p-4 flex flex-col h-full bg-gray-100 min-h-screen">
-      <div className="messages overflow-y-auto flex flex-col gap-4">
+      <div className="messages overflow-y-auto flex flex-col gap-2">
         {messages.length > 0 ? (
           messages.map((msg, index) => (
-            <div key={index} className={`chat flex ${msg.senderID === currentUserID ? "justify-end" : "justify-start"}`}>
-              {shouldShowProfilePicture(index) && (
-                <div className="chat-image avatar -mr-2"> {/* Adjust alignment */}
-                  <ProfilePictureOrInitial user={msg.senderID === currentUserID ? user : otherUser} />
-                </div>
-              )}
-              <div className={`chat-bubble ${msg.senderID === currentUserID ? "bg-blue-500 text-white" : "bg-white text-gray-800 shadow"}`}> {/* Improved bubble contrast */}
-                <div className="chat-header flex justify-between w-full">
+            <div key={index} className={`chat ${msg.senderID === currentUserID ? "items-end" : "items-start"} flex flex-col`}>
+              <div className="flex items-center gap-2">
+                {shouldShowProfilePicture(index) && (
+                  <div className={`chat-image avatar ${msg.senderID === currentUserID ? "order-2" : ""}`}>
+                    <ProfilePictureOrInitial user={msg.senderID === currentUserID ? user : otherUser} />
+                  </div>
+                )}
+                <div className={`chat-header text-sm ${msg.senderID === currentUserID ? "text-right" : "text-left"}`}>
                   <span className="font-bold">{msg.senderID === currentUserID ? user?.name : otherUser?.name}</span>
-                  <time className="text-xs text-gray-500">{new Date(msg.sentAt).toLocaleTimeString()}</time>
+                  <time className="text-xs opacity-50 ml-2">{new Date(msg.sentAt).toLocaleTimeString()}</time>
                 </div>
-                <p className="text-sm">{msg.text}</p> {/* Ensured text is wrapped in a paragraph for better control */}
+              </div>
+              <div className={`chat-bubble shadow rounded-lg mt-1 ${msg.senderID === currentUserID ? "bg-blue-600 text-white p-3 self-end" : "bg-gray-200 text-gray-800 p-3 self-start"}`}>
+                {msg.text}
+              </div>
+              <div className={`chat-footer text-xs opacity-50 ${msg.senderID === currentUserID ? "self-end" : "self-start"}`}>
+                {msg.senderID === currentUserID ? "Delivered" : ""}
               </div>
             </div>
           ))
         ) : (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-lg text-gray-800 mb-4">No messages yet.</p> {/* Adjusted text color for better visibility */}
+            <p className="text-lg text-gray-800 mb-4">No messages yet.</p>
           </div>
         )}
       </div>
       <div className="send-message-form mt-4 flex gap-2">
         <textarea
-          className="textarea textarea-bordered flex-1"
+          className="textarea textarea-bordered flex-1 p-2"
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Write a message..."
@@ -115,6 +121,8 @@ const MessagePanel: React.FC = () => {
       </div>
     </div>
   );
+
+  
   
 };
 
