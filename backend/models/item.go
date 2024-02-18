@@ -14,7 +14,7 @@ type Attributes struct {
 // Remaining structs (Location, Item) remain unchanged
 
 type Location struct {
-	Latitude  float64 `json:"latude"`
+	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 }
 
