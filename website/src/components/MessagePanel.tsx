@@ -77,28 +77,28 @@ const MessagePanel: React.FC = () => {
   
 
   return (
-    <div className="message-panel p-4 flex flex-col h-full">
-      <div className="messages overflow-y-auto flex flex-col gap-2">
+    <div className="message-panel p-4 flex flex-col h-full bg-gray-100 min-h-screen">
+      <div className="messages overflow-y-auto flex flex-col gap-4">
         {messages.length > 0 ? (
           messages.map((msg, index) => (
-            <div key={index} className={`chat ${msg.senderID === currentUserID ? "chat-end items-end" : "chat-start items-start"}`}>
+            <div key={index} className={`chat flex ${msg.senderID === currentUserID ? "justify-end" : "justify-start"}`}>
               {shouldShowProfilePicture(index) && (
-                <div className="chat-image avatar">
+                <div className="chat-image avatar -mr-2"> {/* Adjust alignment */}
                   <ProfilePictureOrInitial user={msg.senderID === currentUserID ? user : otherUser} />
                 </div>
               )}
-              <div className={`chat-bubble ${msg.senderID === currentUserID ? "bg-blue-500 text-white" : "bg-gray-200"}`}>
+              <div className={`chat-bubble ${msg.senderID === currentUserID ? "bg-blue-500 text-white" : "bg-white text-gray-800 shadow"}`}> {/* Improved bubble contrast */}
                 <div className="chat-header flex justify-between w-full">
-                  <span>{msg.senderID === currentUserID ? user?.name : otherUser?.name}</span>
-                  <time className="text-xs opacity-50">{new Date(msg.sentAt).toLocaleTimeString()}</time>
+                  <span className="font-bold">{msg.senderID === currentUserID ? user?.name : otherUser?.name}</span>
+                  <time className="text-xs text-gray-500">{new Date(msg.sentAt).toLocaleTimeString()}</time>
                 </div>
-                {msg.text}
+                <p className="text-sm">{msg.text}</p> {/* Ensured text is wrapped in a paragraph for better control */}
               </div>
             </div>
           ))
         ) : (
           <div className="flex flex-col items-center justify-center h-full">
-            <p className="text-lg mb-4">No messages yet.</p>
+            <p className="text-lg text-gray-800 mb-4">No messages yet.</p> {/* Adjusted text color for better visibility */}
           </div>
         )}
       </div>
@@ -115,6 +115,7 @@ const MessagePanel: React.FC = () => {
       </div>
     </div>
   );
+  
 };
 
 export default MessagePanel;
