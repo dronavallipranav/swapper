@@ -30,6 +30,12 @@ const ItemPage = () => {
     );
   }
 
+
+  // Function to handle navigation
+  const handleNavigate = () => {
+    nav(`/messages?userID=${encodeURIComponent(item.userId)}`);
+  };
+
   return (
     <div className="container mx-auto px-4 py-10 mt-8">
       <div className="card lg:card-side bg-base-200 shadow-xl">
@@ -92,7 +98,7 @@ const ItemPage = () => {
           <h2 className="card-title">{item.title}</h2>
           <p>{item.description}</p>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary">Contact Owner</button>
+            <button className="btn btn-primary" onClick={handleNavigate}>Contact Owner</button>
             {isItemOwner && (
               <>
                 <button className="btn btn-secondary">Edit</button>

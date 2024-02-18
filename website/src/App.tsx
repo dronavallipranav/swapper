@@ -46,6 +46,14 @@ function App() {
                   </ProtectedRoute>
                 }
               />
+              <Route
+                path="/messages/:userID"
+                element={
+                  <ProtectedRoute>
+                    <MessagePanel />
+                  </ProtectedRoute>
+                }
+              />
 
               {/* Authentication Routes */}
               <Route path="/login" element={<LoginPage />} />

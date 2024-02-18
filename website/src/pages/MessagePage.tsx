@@ -5,12 +5,14 @@ import { Message } from "../models/Message";
 import { User } from "../models/User";
 import api from '../services/AxiosInterceptor';
 import { set } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 
 const ConversationsPage: React.FC = () => {
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Message[]>([]);
   const [participants, setParticipants] = useState<{ [key: string]: User }>({});
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user) {
@@ -27,8 +29,7 @@ const ConversationsPage: React.FC = () => {
           return acc;
         }, []);
         setConversations(data.conversations);
-        console.log(data);
-        console.log(conversations);
+       
         const participantDetails: User[] = await Promise.all(
           participantIds.map(async (id) => {
             const response = await api.get<User>(`/${id}`);
@@ -36,12 +37,12 @@ const ConversationsPage: React.FC = () => {
             return response.data;
           })
         );
-
+          
         const participantsMap: { [key: string]: User } = participantDetails.reduce<{ [key: string]: User }>((acc, currentUser) => {
-          acc[currentUser.id] = currentUser;
+          acc[currentUser.user.id] = currentUser.user;
           return acc;
         }, {});
-
+        
         setParticipants(participantsMap);
       } catch (error) {
         console.error('Failed to fetch conversations or user details:', error);
@@ -65,10 +66,12 @@ const ConversationsPage: React.FC = () => {
       <ul>
         {conversations.map((message, index) => {
           const otherUserId = message.senderID === user?.id ? message.recipientID : message.senderID;
+      
           const otherUser = participants[otherUserId];
-          console.log(otherUser);
+          let url = `/messages/${encodeURIComponent(otherUserId)}`;
+          console.log(url);
           return (
-            <li key={index} className="mb-2">
+            <li key={index} className="mb-2"  onClick={() => navigate(url)}>
               <div className="flex items-center gap-2">
                 {otherUser?.profilePicture ? (
                   <img src={otherUser.profilePicture} alt={otherUser.name} className="w-10 h-10 rounded-full" />
