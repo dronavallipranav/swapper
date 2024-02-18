@@ -116,6 +116,10 @@ func (h *MessageHandler) GetUserConversations(c *gin.Context) {
 		filteredConversations = append(filteredConversations, msg)
 	}
 
+	sort.Slice(filteredConversations, func(i, j int) bool {
+		return filteredConversations[i].SentAt.After(filteredConversations[j].SentAt)
+	})
+
 	//return filtered conversations array
 	c.JSON(http.StatusOK, gin.H{"conversations": filteredConversations})
 }

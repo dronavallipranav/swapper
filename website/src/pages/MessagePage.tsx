@@ -94,7 +94,7 @@ const ConversationsPage: React.FC = () => {
           return (
             <li
               key={index}
-              className="mb-2 cursor-pointer"
+              className="mb-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
               onClick={() => navigate(url)}
             >
               <div className="flex items-center gap-2">
@@ -104,12 +104,14 @@ const ConversationsPage: React.FC = () => {
                     {otherUser?.name || "Unknown"}
                   </div>
                   <div className="text-sm text-gray-600 overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[200px]">
-                    {message.text}
+                    {/* Check if the current user is the sender. If so, prepend "You: " to the message text. */}
+                    {message.senderID === user?.id ? `You: ${message.text}` : message.text}
                   </div>
                 </div>
               </div>
             </li>
           );
+          
         })}
       </ul>
     </div>
