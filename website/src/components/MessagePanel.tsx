@@ -13,7 +13,8 @@ const MessagePanel: React.FC = () => {
   
   //grab the recipient's user ID from the URL
   const { userID } = useParams<{ userID: string }>(); 
-  const userId = userID?.replace(/_/g, "/");
+  const userId = userID;
+  
   const [messages, setMessages] = useState<Message[]>([]);
   const [newMessage, setNewMessage] = useState<string>("");
   const [otherUser, setOtherUser] = useState<User | null>(null); // State to hold the other user's details

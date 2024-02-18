@@ -68,7 +68,7 @@ const ConversationsPage: React.FC = () => {
           const otherUserId = message.senderID === user?.id ? message.recipientID : message.senderID;
       
           const otherUser = participants[otherUserId];
-          let url = `/messages/${otherUserId.replace(/\//g, "_")}`;
+          let url = `/messages/${encodeURIComponent(otherUserId)}`;
           console.log(url);
           return (
             <li key={index} className="mb-2"  onClick={() => navigate(url)}>
