@@ -18,15 +18,19 @@ const MessagePanel: React.FC = () => {
   useEffect(() => {
     if (!user || !userID) return;
 
-    getUser(userID).then((fetchedUser) => {
-      setOtherUser(fetchedUser);
-    }).catch((e) => {
-      console.error("Failed to load other user's details:", e);
-    })
+    getUser(userID)
+      .then((fetchedUser) => {
+        setOtherUser(fetchedUser);
+      })
+      .catch((e) => {
+        console.error("Failed to load other user's details:", e);
+      });
 
     const fetchMessages = async () => {
       try {
-        const response = await api.get<{ messages: Message[] }>(`/messages?otherUserID=${encodeURIComponent(userID)}`);
+        const response = await api.get<{ messages: Message[] }>(
+          `/messages?otherUserID=${encodeURIComponent(userID)}`
+        );
         setMessages(response.data.messages);
       } catch (error) {
         console.error("Failed to load messages:", error);
@@ -55,49 +59,56 @@ const MessagePanel: React.FC = () => {
     }
   };
 
-  const shouldShowProfilePicture = (index: number) => {
-    return true;
-
-    // Always show for the first message
-    if (index === 0) return true;
-  
-    const currentMessage = messages[index];
-    const previousMessage = messages[index - 1];
-  
-    // Show if the message is from a different sender than the previous message
-    if (currentMessage.senderID !== previousMessage.senderID) return true;
-  
-    const currentMessageDate = new Date(currentMessage.sentAt).getTime();
-    const previousMessageDate = new Date(previousMessage.sentAt).getTime();
-    
-    // Calculate the time difference in minutes
-    const diffMinutes = (currentMessageDate - previousMessageDate) / (1000 * 60);
-  
-    // Show if there's a significant time gap (e.g., more than 20 minutes)
-    return diffMinutes > 20;
-  };
-
   return (
     <div className="message-panel p-4 flex flex-col h-full bg-gray-100 min-h-screen">
       <div className="messages overflow-y-auto flex flex-col gap-2">
         {messages.length > 0 ? (
           messages.map((msg, index) => (
-            <div key={index} className={`chat ${msg.senderID === currentUserID ? "items-end" : "items-start"} flex flex-col`}>
+            <div
+              key={index}
+              className={`chat ${
+                msg.senderID === currentUserID ? "items-end" : "items-start"
+              } flex flex-col`}
+            >
               <div className="flex items-center gap-2">
-                {shouldShowProfilePicture(index) && (
-                  <div className={`chat-image avatar ${msg.senderID === currentUserID ? "order-2" : ""}`}>
-                    <ProfilePictureOrInitial user={msg.senderID === currentUserID ? user : otherUser} />
-                  </div>
-                )}
-                <div className={`chat-header text-sm ${msg.senderID === currentUserID ? "text-right" : "text-left"}`}>
-                  <span className="font-bold">{msg.senderID === currentUserID ? user?.name : otherUser?.name}</span>
-                  <time className="text-xs opacity-50 ml-2">{new Date(msg.sentAt).toLocaleTimeString()}</time>
+                <div
+                  className={`chat-image avatar ${
+                    msg.senderID === currentUserID ? "order-2" : ""
+                  }`}
+                >
+                  <ProfilePictureOrInitial
+                    user={msg.senderID === currentUserID ? user : otherUser}
+                  />
+                </div>
+                <div
+                  className={`chat-header text-sm ${
+                    msg.senderID === currentUserID ? "text-right" : "text-left"
+                  }`}
+                >
+                  <span className="font-bold">
+                    {msg.senderID === currentUserID
+                      ? user?.name
+                      : otherUser?.name}
+                  </span>
+                  <time className="text-xs opacity-50 ml-2">
+                    {new Date(msg.sentAt).toLocaleTimeString()}
+                  </time>
                 </div>
               </div>
-              <div className={`chat-bubble shadow rounded-lg mt-1 ${msg.senderID === currentUserID ? "bg-blue-600 text-white p-3 self-end" : "bg-gray-200 text-gray-800 p-3 self-start"}`}>
+              <div
+                className={`chat-bubble shadow rounded-lg mt-1 ${
+                  msg.senderID === currentUserID
+                    ? "bg-blue-600 text-white p-3 self-end"
+                    : "bg-gray-200 text-gray-800 p-3 self-start"
+                }`}
+              >
                 {msg.text}
               </div>
-              <div className={`chat-footer text-xs opacity-50 ${msg.senderID === currentUserID ? "self-end" : "self-start"}`}>
+              <div
+                className={`chat-footer text-xs opacity-50 ${
+                  msg.senderID === currentUserID ? "self-end" : "self-start"
+                }`}
+              >
                 {msg.senderID === currentUserID ? "Delivered" : ""}
               </div>
             </div>
@@ -121,9 +132,6 @@ const MessagePanel: React.FC = () => {
       </div>
     </div>
   );
-
-  
-  
 };
 
 export default MessagePanel;
