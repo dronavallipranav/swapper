@@ -98,7 +98,7 @@ const ItemPage = () => {
           <h2 className="card-title">{item.title}</h2>
           <p>{item.description}</p>
           <div className="card-actions justify-end">
-            <button className="btn btn-primary" onClick={handleNavigate}>Contact Owner</button>
+            {!isItemOwner && <button className="btn btn-primary" onClick={handleNavigate}>Contact Owner</button>}
             {isItemOwner && (
               <>
                 <button className="btn btn-secondary">Edit</button>
