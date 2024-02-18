@@ -1,5 +1,5 @@
-import React, { useRef, useState } from "react";
-import { createItem } from "../../services/ItemService";
+import React, { useEffect, useRef, useState } from "react";
+import { createItem, fetchItemAttributes } from "../../services/ItemService";
 import { useNavigate } from "react-router-dom";
 import { Location } from "../../services/LocationService";
 import CitySearchComponent from "../../components/CitySearch";
@@ -7,17 +7,24 @@ import CitySearchComponent from "../../components/CitySearch";
 export const NewItemPage = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [quantity, setQuantity] = useState(0);
+  const [quantity, setQuantity] = useState(1);
   const [categories, setCategories] = useState("");
   const [status, setStatus] = useState("");
   const [error, setError] = useState("");
   const nav = useNavigate();
   const [images, setImages] = useState<File[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [itemLocation, setItemLocation] = useState<Location>();
+  const [itemLocation, setItemLocation] = useState<Location | null>(null);
+  const [attributes, setAttributes] = useState<Record<string, string[]>>({});
+  const [selectedAttributeKey, setSelectedAttributeKey] = useState<string>("");
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    fetchItemAttributes().then(setAttributes).catch(console.error);
+  }, []);
 
   const handleAddImage = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
+    if (e.target.files && e.target.files[0]) {
       setImages([...images, e.target.files[0]]);
       e.target.value = "";
     }
@@ -27,51 +34,54 @@ export const NewItemPage = () => {
     setImages(images.filter((_, i) => i !== index));
   };
 
+  const handleAttributeKeyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedAttributeKey(e.target.value);
+  };
+
+  const handleAttributeValueChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    if (selectedAttributeKey) {
+      setSelectedAttributes((prev) => ({
+        ...prev,
+        [selectedAttributeKey]: value,
+      }));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const item = {
-      id: "",
-      userId: "",
-      title,
-      description,
-      quantity: Number(quantity),
-      categories: categories.split(",").map((cat) => cat.trim()),
-      status,
-      images,
-    };
-
     const formData = new FormData();
-    formData.append("title", item.title);
-    formData.append("description", item.description);
-    formData.append("quantity", item.quantity.toString());
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("quantity", quantity.toString());
+    categories.split(",").forEach((cat) => formData.append("categories[]", cat.trim()));
+    formData.append("status", status);
     if (itemLocation) {
       formData.append("location", JSON.stringify(itemLocation));
     }
-    if (item.categories) {
-      item.categories.forEach((category) =>
-        formData.append("categories[]", category)
-      );
-    }
-    formData.append("status", item.status);
-    Array.from(images || []).forEach((file) => {
-      formData.append("images", file);
-    });
+    images.forEach((image) => formData.append("images", image));
 
-    createItem(formData)
-      .then((id) => {
-        setError("");
-        // Redirect to the item's page after successful creation
-        nav(`/${id}`);
-      })
-      .catch((e) => {
-        if (e.response.data.error) {
-          setError(e.response.data.error);
-          return;
-        }
-        setError("An error occurred. Please try again.");
-      });
+    formData.append("attributes", JSON.stringify(selectedAttributes));
+
+    try {
+      const id = await createItem(formData);
+      setError("");
+      nav(`/${id}`);
+    } catch (e) {
+      setError("An error occurred. Please try again later.");
+      console.error(e);
+    }
   };
+
+  const handleRemoveSelectedAttribute = (attributeKey: string) => {
+    setSelectedAttributes((prev) => {
+      const updatedAttributes = { ...prev };
+      delete updatedAttributes[attributeKey];
+      return updatedAttributes;
+    });
+  };
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
@@ -79,7 +89,7 @@ export const NewItemPage = () => {
         <h3 className="text-2xl font-bold text-center">Create New Item</h3>
         {error && <p className="text-red-500">{error}</p>}
         <form onSubmit={handleSubmit} className="mt-4">
-          <div>
+        <div>
             <label htmlFor="title" className="block">
               Title
             </label>
@@ -184,6 +194,55 @@ export const NewItemPage = () => {
             />
           </div>
 
+          <div className="mt-4">
+            <label htmlFor="attributeType" className="block">Attribute Type</label>
+            <select
+              id="attributeType"
+              value={selectedAttributeKey}
+              onChange={handleAttributeKeyChange}
+              className="w-full px-4 py-2 mt-2 border rounded-md"
+            >
+              <option value="">Select Attribute Type</option>
+              {Object.keys(attributes).map((key) => (
+                <option key={key} value={key}>{key}</option>
+              ))}
+            </select>
+          </div>
+
+          {/* Attribute selection logic */}
+          {selectedAttributeKey && (
+            <div className="mt-4">
+              <label htmlFor="attributeValue" className="block">{selectedAttributeKey}</label>
+              <select
+                id="attributeValue"
+                value={selectedAttributes[selectedAttributeKey] || ''}
+                onChange={handleAttributeValueChange}
+                className="w-full px-4 py-2 mt-2 border rounded-md"
+              >
+                <option value="">Select Value</option>
+                {attributes[selectedAttributeKey]?.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          {/* Display selected attributes and remove option */}
+          <div className="mt-4">
+            {Object.entries(selectedAttributes).map(([key, value]) => (
+              <div key={key} className="flex items-center justify-between mt-2 p-2 bg-gray-100 rounded-md">
+                <span>{key}: {value}</span>
+                <button
+                  type="button"
+                  onClick={() => handleRemoveSelectedAttribute(key)}
+                  className="ml-4 px-2 py-1 text-white bg-red-500 rounded-md hover:bg-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+          
           <div className="flex justify-end mt-6">
             <button
               type="submit"

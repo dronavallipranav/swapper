@@ -63,3 +63,10 @@ export const createItem = async (formData: FormData): Promise<string> => {
 export const deleteItem = async (itemId: string): Promise<AxiosResponse> => {
   return api.delete(`/${itemId}`);
 }
+
+export const fetchItemAttributes = async (): Promise<Record<string, string[]>> => {
+  const response = await api.get<
+  {attributes: Record<string, string[]>}
+  >('/items/attributes');
+  return response.data.attributes;
+}
