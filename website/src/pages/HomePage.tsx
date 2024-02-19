@@ -4,6 +4,7 @@ import { fetchAllItems } from "../services/ItemService";
 import CitySearchComponent from "../components/CitySearch";
 import { Location } from "../services/LocationService";
 import AttributeSelector from "../components/AttributeSelect";
+import { useNavigate } from "react-router-dom";
 
 const categories = [
   "Electronics",
@@ -22,6 +23,7 @@ function HomePage() {
   const [location, setLocation] = useState<Location>();
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const attributeSelectorRef = useRef(null);
+  const nav = useNavigate();
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     // check if its a child of the attributeSelectorRef,
@@ -164,29 +166,43 @@ function HomePage() {
           items.map((item) => (
             <div
               key={item.id}
-              className="card card-compact w-full md:w-75 bg-base-100 shadow-xl"
+              className="card card-compact w-full md:w-75 bg-base-100 shadow-xl hover:scale-110 cursor-pointer transform transition-transform"
+              onClick={() => {
+                nav(`/${item.id}`)
+              }}
             >
               {item.attachments && item.attachments[0] && (
                 <figure>
-                  <img
-                    src={item.attachments[0]}
-                    alt="Item"
-                    className="rounded-xl"
-                  />
+                  <img src={item.attachments[0]} alt="Item" />
                 </figure>
               )}
-              <div className="card-body">
-                <h2 className="card-title">{item.title}</h2>
-                <p>{item.description}</p>
-                <div className="card-actions justify-end">
-                  <button
-                    className="btn btn-primary"
-                    onClick={() => {
-                      window.location.href = `/${item.id}`;
-                    }}
-                  >
-                    View Item
-                  </button>
+
+              <div className="card-body mt-[-8px]">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    {item.title}
+                  </h2>
+                  {item?.createdAt && (
+                    <div className="flex items-center text-gray-400 text-xs">
+                      <span className="ml-2">
+                        {new Date(item.createdAt).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                        })}
+                      </span>
+                      <span className="mx-1">·</span>
+                      <span>
+                        {new Date(item.createdAt).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                          hour12: true,
+                        })}
+                      </span>
+                    </div>
+                  )}
+
+                  <p className="text-gray-700 mt-2">{item.description}</p>
                 </div>
               </div>
             </div>
