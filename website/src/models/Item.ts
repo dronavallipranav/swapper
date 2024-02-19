@@ -23,5 +23,6 @@ export interface Item {
     attachments?: string[];
     location?: Location;
     attributes?: Attributes;
+    createdAt: string;
 }
 

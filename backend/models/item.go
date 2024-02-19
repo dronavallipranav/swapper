@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Attributes struct {
 	Condition        string `json:"condition" form:"condition" validate:"omitempty,oneof=new used refurbished"`
 	Size             string `json:"size" form:"size" validate:"omitempty,oneof=small medium large"`
@@ -30,4 +32,5 @@ type Item struct {
 	Location    Location   `json:"location"`
 	Attachments []string   `json:"attachments"`
 	Attributes  Attributes `json:"attributes"`
+	CreatedAt   time.Time  `json:"createdAt"`
 }

@@ -1,218 +1,237 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Item } from "../../models/Item";
-import { deleteItem, fetchItemById } from "../../services/ItemService";
-import { useAuth } from "../../contexts/AuthContext";
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import { fetchItemById, deleteItem } from "../../services/ItemService";
 import { sendMessage } from "../../services/MessageService";
+import { useAuth } from "../../contexts/AuthContext";
+import { Item } from "../../models/Item";
+import { User } from "../../models/User";
+import { getUser } from "../../services/AuthService";
+import ProfilePictureOrInitial from "../../components/ProfilePictureOrInitial";
 
 const ItemPage = () => {
   let { itemID } = useParams();
   const [item, setItem] = useState<Item | null>(null);
-  const [isItemOwner, setIsItemOwner] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const nav = useNavigate();
-  const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [owner, setOwner] = useState<User>();
+  const [isItemOwner, setIsItemOwner] = useState(false);
+  const { user } = useAuth();
+  const nav = useNavigate();
 
   useEffect(() => {
     if (!itemID) return;
-    fetchItemById("items/" + itemID).then((fetchedItem) => {
-      setItem(fetchedItem);
-      if (user !== null && fetchedItem.userId === user.id) {
-        setIsItemOwner(true);
-      }
-      // Prepopulate the message with a default text
-      setMessage(`Hi, I'm interested in your ${fetchedItem.title}`);
-    });
+    fetchItemById("items/" + itemID)
+      .then((fetchedItem) => {
+        setItem(fetchedItem);
+
+        if (fetchedItem.userId === user?.id) {
+          setIsItemOwner(true);
+        }
+
+        if (fetchedItem.userId) {
+          getUser(fetchedItem.userId)
+            .then((fetchedUser) => {
+              setOwner(fetchedUser);
+            })
+            .catch((error) => setError("Failed to fetch owner details."));
+        }
+
+        setMessage(`Hi, I'm interested in your ${fetchedItem.title}`);
+      })
+      .catch((error) => setError("Failed to fetch item details."));
   }, [itemID, user]);
 
-  if (!item) {
-    return (
-      <div className="flex justify-center items-center h-screen">
-        Loading...
-      </div>
-    );
-  }
-
-  // Function to handle navigation
-  const handleSendMessage = () => {
-    sendMessage(item.userId, message)
-      .then((id: string) => {
+  const handleSendMessage = async () => {
+    if (item && user) {
+      try {
+        await sendMessage(user.id, message);
         setIsModalOpen(false);
-        nav(`/messages/${encodeURIComponent(id)}`);
-      })
-      .catch((e) => {
-        if (e.response && e.response.data && e.response.data.error) {
-          setError(e.response.data.error);
-          return;
-        }
-        setError("An error occurred. Please try again.");
-      });
+        nav("/messages");
+      } catch (error) {
+        setError("Failed to send message.");
+      }
+    }
   };
 
+  function toTitleCaseWithSpaces(str: string) {
+    return str
+      .replace(/([A-Z])/g, " $1")
+      .trim()
+      .replace(/^./, (firstChar) => firstChar.toUpperCase());
+  }
+
   return (
-    <div className="container mx-auto px-4 py-10 mt-8">
-      <div className="card lg:card-side bg-base-200 shadow-xl">
-        {error && <div className="alert alert-error">{error}</div>}
-        <div className="card-body">
-          {item.categories && (
-            <div className="badge badge-outline">
-              Categories:{" "}
-              {item.categories.map((category, index) => (
-                <span key={index} className="badge badge-outline mx-1">
-                  {category}
-                </span>
+    <div className="container mx-auto mt-4 mb-4">
+      {error && <div className="alert alert-error">{error}</div>}
+      <div className="flex flex-wrap lg:flex-nowrap">
+        <div
+          className="relative w-full lg:w-3/4"
+          style={{ overflow: "hidden" }}
+        >
+          <div className="carousel">
+            {item?.attachments?.map((attachment, index) => (
+              <div
+                id={`slide${index}`}
+                className="carousel-item w-full"
+                key={index}
+              >
+                <img
+                  src={attachment}
+                  alt={`Slide ${index}`}
+                  className="object-contain h-full w-full"
+                />
+              </div>
+            ))}
+          </div>
+          {/* Navigation Buttons */}
+          <div className="flex justify-center w-full gap-2">
+            <div className="flex justify-center w-full gap-2 overflow-x-auto">
+              {item?.attachments?.map((attachment, index) => (
+                <a
+                  href={`#slide${index}`}
+                  className="carousel-thumb"
+                  key={index}
+                >
+                  <img
+                    src={attachment}
+                    alt={`Thumbnail ${index}`}
+                    className="object-cover h-16 w-16 rounded-lg shadow-lg"
+                  />
+                </a>
               ))}
             </div>
-          )}
-          {/* Images Display Section */}
-          <div className="flex flex-wrap justify-center mt-4 mx-auto">
-            <div className="carousel w-full">
-              {item.attachments &&
-                item.attachments.map((base64EncodedImage, index) => (
-                  <div
-                    id={`slide${index}`}
-                    className="carousel-item relative w-full"
-                  >
-                    <img
-                      src={`${base64EncodedImage}`}
-                      alt={`Attachment ${index}`}
-                      className="rounded-box"
-                    />
-                    {item?.attachments?.length &&
-                      item?.attachments?.length > 1 && (
-                        <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                          <a
-                            href={
-                              `#slide` +
-                              (index === 0
-                                ? (item.attachments?.length ?? 0) - 1
-                                : index - 1)
-                            }
-                            className="btn btn-circle"
-                          >
-                            ❮
-                          </a>
-                          <a
-                            href={
-                              "#slide" +
-                              (index === (item.attachments?.length ?? 0) - 1
-                                ? 0
-                                : index + 1)
-                            }
-                            className="btn btn-circle"
-                          >
-                            ❯
-                          </a>
-                        </div>
-                      )}
-                  </div>
-                ))}
-            </div>
           </div>
-          <h2 className="card-title">{item.title}</h2>
-          <p>{item.description}</p>
-          <div className="card-actions justify-end">
-            {!isItemOwner && (
-              <button
-                className="btn btn-primary"
-                onClick={() => setIsModalOpen(true)}
-              >
-                Contact Owner
-              </button>
-            )}
+        </div>
 
-            {isModalOpen && (
-              <div className="modal modal-open">
-                <div className="modal-box">
-                  <h3 className="font-bold text-lg">Contact Owner</h3>
-                  <textarea
-                    className="textarea textarea-bordered w-full mt-4"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                  ></textarea>
-                  <div className="modal-action">
-                    <button
-                      className="btn btn-primary"
-                      onClick={handleSendMessage}
-                    >
-                      Send Message
-                    </button>
-                    <button
-                      className="btn"
-                      onClick={() => setIsModalOpen(false)}
-                    >
-                      Cancel
-                    </button>
+        {/* Item Details Section */}
+        <div className="w-full lg:w-1/4 pl-0 lg:pl-4 mt-4 lg:mt-0">
+          <div className="bg-white shadow rounded-lg overflow-hidden">
+            <div className="p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                {item?.title}
+              </h2>
+              {item?.createdAt && (
+                <p className="text-sm text-gray-500 mb-4">
+                  Posted on {new Date(item.createdAt).toLocaleDateString()} at{" "}
+                  {new Date(item.createdAt).toLocaleTimeString()}
+                </p>
+              )}
+
+              <p className="text-gray-700 mb-4">{item?.description}</p>
+
+              {owner && (
+                <div className="flex items-center gap-4 mb-4">
+                  <div className="shrink-0">
+                    <ProfilePictureOrInitial user={owner} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-medium text-gray-900">
+                      {owner.name}
+                    </h3>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {isItemOwner && (
-              <>
-                <button className="btn btn-secondary">Edit</button>
-                <button
-                  onClick={() => {
-                    deleteItem(item.id)
-                      .then(() => {
-                        // Redirect to the home page after successful deletion
-                        nav("/");
-                      })
-                      .catch((e) => {
-                        if (
-                          e.response &&
-                          e.response.data &&
-                          e.response.data.error
-                        ) {
-                          setError(e.response.data.error);
-                          return;
-                        }
-                        setError("An error occurred. Please try again.");
-                      });
-                  }}
-                  className="btn btn-error"
-                >
-                  Delete
-                </button>
-              </>
-            )}
-          </div>
-          
-          {/*count the number of values in object, if it is greater than 0, then render the table
-            // if not, then don't render the table*/}
-          { Object.entries(item.attributes || {}).some(([, value]) => value !== "" && value != null) && (
-            <>
-            <div className="divider"></div>
-            <div className="overflow-x-auto w-full p-4 rounded-xl">
-              <table className="table w-full table-zebra">
-                <thead>
-                  <tr>
-                    <th>Attribute</th>
-                    <th>Details</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {/* Dynamically render item attributes */}
-                  {Object.entries(item.attributes || {}).map(
-                    ([key, value]) =>
-                      value && (
-                        <tr key={key}>
-                          <td>{key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                          <td>
+              {Object.entries(item?.attributes || {}).some(
+                ([, value]) => value
+              ) && (
+                <div className="mb-4">
+                  <h4 className="text-md font-semibold text-gray-800 mb-2">
+                    Details
+                  </h4>
+                  <div className="border-t border-gray-200">
+                    {Object.entries(item?.attributes || {})
+                      .filter(([, value]) => value)
+                      .map(([key, value], idx) => (
+                        <div
+                          key={idx}
+                          className="py-2 flex justify-between items-center"
+                        >
+                          <span className="text-gray-600">
+                            {toTitleCaseWithSpaces(key)}
+                          </span>
+                          <span className="text-gray-900">
                             {Array.isArray(value) ? value.join(", ") : value}
-                          </td>
-                        </tr>
-                      )
-                  )}
-                </tbody>
-              </table>
+                          </span>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              {!isItemOwner && user && (
+                <button
+                  className="btn btn-primary w-full"
+                  onClick={() => setIsModalOpen(true)}
+                >
+                  Contact Owner
+                </button>
+              )}
+
+              {!isItemOwner && !user && (
+                <button
+                className="btn btn-primary w-full"
+                onClick={() => {nav("/login")}}
+              >
+                Login to Contact Owner
+              </button>
+              )}
+
+              {isItemOwner && (
+                <>
+                  <button className="btn btn-secondary mr-2">Edit</button>
+                  <button
+                    onClick={() => {
+                      deleteItem(item?.id || "")
+                        .then(() => {
+                          // Redirect to the home page after successful deletion
+                          nav("/");
+                        })
+                        .catch((e) => {
+                          if (
+                            e.response &&
+                            e.response.data &&
+                            e.response.data.error
+                          ) {
+                            setError(e.response.data.error);
+                            return;
+                          }
+                          setError("An error occurred. Please try again.");
+                        });
+                    }}
+                    className="btn btn-error"
+                  >
+                    Delete
+                  </button>
+                </>
+              )}
             </div>
-            </>
-          )}
+          </div>
         </div>
       </div>
+
+      {/* Modal for sending a message */}
+      {isModalOpen && (
+        <div className="modal modal-open">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg">Contact Owner</h3>
+            <textarea
+              className="textarea textarea-bordered w-full mt-4"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+            />
+            <div className="modal-action">
+              <button className="btn btn-primary" onClick={handleSendMessage}>
+                Send Message
+              </button>
+              <button className="btn" onClick={() => setIsModalOpen(false)}>
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
