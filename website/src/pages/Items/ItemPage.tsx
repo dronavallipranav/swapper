@@ -67,7 +67,7 @@ const ItemPage = () => {
             </div>
           )}
           {/* Images Display Section */}
-          <div className="flex flex-wrap justify-center mt-4">
+          <div className="flex flex-wrap justify-center mt-4 mx-auto">
             <div className="carousel w-full">
               {item.attachments &&
                 item.attachments.map((base64EncodedImage, index) => (
