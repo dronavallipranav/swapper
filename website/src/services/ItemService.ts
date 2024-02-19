@@ -19,6 +19,7 @@ export const fetchAllItems = async ({
   sort = "title",
   order = "asc",
   search = "",
+  attributes = {},
 }: {
   latitude: number;
   longitude: number;
@@ -30,6 +31,7 @@ export const fetchAllItems = async ({
   sort?: string;
   order?: string;
   search?: string;
+  attributes?: Record<string, string[]>;
 }): Promise<Item[]> => {
   // Construct query parameters string
   const queryParams = new URLSearchParams({
@@ -43,6 +45,7 @@ export const fetchAllItems = async ({
     sort,
     order,
     search,
+    attributes: JSON.stringify(attributes),
   }).toString();
 
   // Use `api.get` to make the request with query parameters
