@@ -66,7 +66,6 @@ const ItemPage = () => {
               ))}
             </div>
           )}
-
           {/* Images Display Section */}
           <div className="flex flex-wrap justify-center mt-4">
             <div className="carousel w-full">
@@ -112,7 +111,6 @@ const ItemPage = () => {
                 ))}
             </div>
           </div>
-
           <h2 className="card-title">{item.title}</h2>
           <p>{item.description}</p>
           <div className="card-actions justify-end">
@@ -181,6 +179,38 @@ const ItemPage = () => {
               </>
             )}
           </div>
+          
+          {/*count the number of values in object, if it is greater than 0, then render the table
+            // if not, then don't render the table*/}
+          { Object.entries(item.attributes || {}).some(([, value]) => value !== "" && value != null) && (
+            <>
+            <div className="divider"></div>
+            <div className="overflow-x-auto w-full p-4 rounded-xl">
+              <table className="table w-full table-zebra">
+                <thead>
+                  <tr>
+                    <th>Attribute</th>
+                    <th>Details</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {/* Dynamically render item attributes */}
+                  {Object.entries(item.attributes || {}).map(
+                    ([key, value]) =>
+                      value && (
+                        <tr key={key}>
+                          <td>{key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                          <td>
+                            {Array.isArray(value) ? value.join(", ") : value}
+                          </td>
+                        </tr>
+                      )
+                  )}
+                </tbody>
+              </table>
+            </div>
+            </>
+          )}
         </div>
       </div>
     </div>
