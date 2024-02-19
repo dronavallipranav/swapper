@@ -30,6 +30,13 @@ export const NewItemPage = () => {
     }
   };
 
+  function toTitleCaseWithSpaces(str: string) {
+    return str
+      .replace(/([A-Z])/g, ' $1')
+      .trim()
+      .replace(/^./, (firstChar) => firstChar.toUpperCase());
+  }
+
   const handleRemoveImage = (index: number) => {
     setImages(images.filter((_, i) => i !== index));
   };
@@ -204,7 +211,7 @@ export const NewItemPage = () => {
             >
               <option value="">Select Attribute Type</option>
               {Object.keys(attributes).map((key) => (
-                <option key={key} value={key}>{key}</option>
+                <option key={key} value={key}>{toTitleCaseWithSpaces(key)}</option>
               ))}
             </select>
           </div>
@@ -212,7 +219,7 @@ export const NewItemPage = () => {
           {/* Attribute selection logic */}
           {selectedAttributeKey && (
             <div className="mt-4">
-              <label htmlFor="attributeValue" className="block">{selectedAttributeKey}</label>
+              <label htmlFor="attributeValue" className="block">{toTitleCaseWithSpaces(selectedAttributeKey)}</label>
               <select
                 id="attributeValue"
                 value={selectedAttributes[selectedAttributeKey] || ''}
@@ -221,7 +228,7 @@ export const NewItemPage = () => {
               >
                 <option value="">Select Value</option>
                 {attributes[selectedAttributeKey]?.map((option) => (
-                  <option key={option} value={option}>{option}</option>
+                  <option key={option} value={option}>{toTitleCaseWithSpaces(option)}</option>
                 ))}
               </select>
             </div>
@@ -231,7 +238,7 @@ export const NewItemPage = () => {
           <div className="mt-4">
             {Object.entries(selectedAttributes).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between mt-2 p-2 bg-gray-100 rounded-md">
-                <span>{key}: {value}</span>
+                <span>{toTitleCaseWithSpaces(key)}: {toTitleCaseWithSpaces(value)}</span>
                 <button
                   type="button"
                   onClick={() => handleRemoveSelectedAttribute(key)}
