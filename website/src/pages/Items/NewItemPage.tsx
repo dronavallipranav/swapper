@@ -255,7 +255,7 @@ export const NewItemPage = () => {
               type="submit"
               className="px-6 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
             >
-              Create Item
+              List Item
             </button>
           </div>
         </form>

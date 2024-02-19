@@ -26,7 +26,7 @@ const Header = () => {
           {isAuthenticated && (
             <>
               <Link to="/messages" className="btn btn-ghost normal-case text-xl">Messages</Link>
-              <Link to="/items/create" className="btn btn-ghost normal-case text-xl">Create Item</Link>
+              <Link to="/items/create" className="btn btn-ghost normal-case text-xl">List Item</Link>
             </>
           )}
           </div>
@@ -39,7 +39,7 @@ const Header = () => {
           {isAuthenticated && (
             <>
               <Link to="/messages" className="block py-2">Messages</Link>
-              <Link to="/items/create" className="block py-2">Create Item</Link>
+              <Link to="/items/create" className="block py-2">List Item</Link>
             </>
           )}
           {!isAuthenticated && (
