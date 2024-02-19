@@ -213,6 +213,43 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	var items []*models.Item
 	q := session.QueryIndex("items/ByLocation")
 	q = q.WithinRadiusOf("coordinates", radius, lat, long)
+
+	//filter for attributes on items
+	condition := c.Query("condition")
+	if condition != "" {
+		q = q.WhereEquals("Attributes.Condition", condition)
+	}
+
+	size := c.Query("size")
+	if size != "" {
+		q = q.WhereEquals("Attributes.Size", size)
+	}
+
+	color := c.Query("color")
+	if color != "" {
+		q = q.WhereEquals("Attributes.Color", color)
+	}
+
+	listingType := c.Query("listingType")
+	if condition != "" {
+		q = q.WhereEquals("Attributes.listingType", listingType)
+	}
+
+	itemCategory := c.Query("itemCategory")
+	if size != "" {
+		q = q.WhereEquals("Attributes.itemCategory", itemCategory)
+	}
+
+	ownershipHistory := c.Query("ownershipHistory")
+	if color != "" {
+		q = q.WhereEquals("Attributes.ownershipHistory", ownershipHistory)
+	}
+
+	authenticity := c.Query("authenticity")
+	if color != "" {
+		q = q.WhereEquals("Attributes.authenticity", authenticity)
+	}
+
 	q = q.Take(limit)
 
 	err = q.GetResults(&items)
