@@ -12,6 +12,7 @@ import (
 	"swapper/middleware"
 	"swapper/models"
 	"swapper/utils"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator"
@@ -82,6 +83,7 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		Location:    addItemReq.Location,
 		Status:      "available",
 		Attributes:  addItemReq.Attributes,
+		CreatedAt:   time.Now(),
 	}
 
 	validate := validator.New()
