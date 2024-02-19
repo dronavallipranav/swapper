@@ -12,6 +12,8 @@ const ItemPage = () => {
   const [error, setError] = useState<string | null>(null);
   const nav = useNavigate();
   const { user } = useAuth();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [message, setMessage] = useState("");
 
   useEffect(() => {
     if (!itemID) return;
@@ -20,6 +22,8 @@ const ItemPage = () => {
       if (user !== null && fetchedItem.userId === user.id) {
         setIsItemOwner(true);
       }
+      // Prepopulate the message with a default text
+      setMessage(`Hi, I'm interested in your ${fetchedItem.title}`);
     });
   }, [itemID, user]);
 
@@ -31,22 +35,20 @@ const ItemPage = () => {
     );
   }
 
-
   // Function to handle navigation
-  const handleNavigate = () => {
-    sendMessage(item.userId, `Hi, I'm interested in your ${item.title}`).then((id: string) => {
-      nav(`/messages/${encodeURIComponent(id)}`);
-    }).catch((e) => {
-      if (
-        e.response &&
-        e.response.data &&
-        e.response.data.error
-      ) {
-        setError(e.response.data.error);
-        return;
-      }
-      setError("An error occurred. Please try again.");
-    })
+  const handleSendMessage = () => {
+    sendMessage(item.userId, message)
+      .then((id: string) => {
+        setIsModalOpen(false);
+        nav(`/messages/${encodeURIComponent(id)}`);
+      })
+      .catch((e) => {
+        if (e.response && e.response.data && e.response.data.error) {
+          setError(e.response.data.error);
+          return;
+        }
+        setError("An error occurred. Please try again.");
+      });
   };
 
   return (
@@ -79,30 +81,33 @@ const ItemPage = () => {
                       alt={`Attachment ${index}`}
                       className="rounded-box"
                     />
-                    {item?.attachments?.length && item?.attachments?.length > 1 && <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
-                      <a
-                        href={
-                          `#slide` +
-                          (index === 0
-                            ? (item.attachments?.length ?? 0) - 1
-                            : index - 1)
-                        }
-                        className="btn btn-circle"
-                      >
-                        ❮
-                      </a>
-                      <a
-                        href={
-                          "#slide" +
-                          (index === (item.attachments?.length ?? 0) - 1
-                            ? 0
-                            : index + 1)
-                        }
-                        className="btn btn-circle"
-                      >
-                        ❯
-                      </a>
-                    </div>}
+                    {item?.attachments?.length &&
+                      item?.attachments?.length > 1 && (
+                        <div className="absolute flex justify-between transform -translate-y-1/2 left-5 right-5 top-1/2">
+                          <a
+                            href={
+                              `#slide` +
+                              (index === 0
+                                ? (item.attachments?.length ?? 0) - 1
+                                : index - 1)
+                            }
+                            className="btn btn-circle"
+                          >
+                            ❮
+                          </a>
+                          <a
+                            href={
+                              "#slide" +
+                              (index === (item.attachments?.length ?? 0) - 1
+                                ? 0
+                                : index + 1)
+                            }
+                            className="btn btn-circle"
+                          >
+                            ❯
+                          </a>
+                        </div>
+                      )}
                   </div>
                 ))}
             </div>
@@ -111,7 +116,42 @@ const ItemPage = () => {
           <h2 className="card-title">{item.title}</h2>
           <p>{item.description}</p>
           <div className="card-actions justify-end">
-            {!isItemOwner && <button className="btn btn-primary" onClick={handleNavigate}>Contact Owner</button>}
+            {!isItemOwner && (
+              <button
+                className="btn btn-primary"
+                onClick={() => setIsModalOpen(true)}
+              >
+                Contact Owner
+              </button>
+            )}
+
+            {isModalOpen && (
+              <div className="modal modal-open">
+                <div className="modal-box">
+                  <h3 className="font-bold text-lg">Contact Owner</h3>
+                  <textarea
+                    className="textarea textarea-bordered w-full mt-4"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  ></textarea>
+                  <div className="modal-action">
+                    <button
+                      className="btn btn-primary"
+                      onClick={handleSendMessage}
+                    >
+                      Send Message
+                    </button>
+                    <button
+                      className="btn"
+                      onClick={() => setIsModalOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             {isItemOwner && (
               <>
                 <button className="btn btn-secondary">Edit</button>
