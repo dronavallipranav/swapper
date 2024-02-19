@@ -68,7 +68,7 @@ const CitySearchComponent: React.FC<CitySearchComponentProps> = ({
   };
 
   return (
-    <div className="p-4">
+    <div>
       {messageText && (
         <label className="label">
           <span className="label-text">{messageText}</span>

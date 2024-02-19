@@ -26,16 +26,15 @@ function HomePage() {
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     // check if its a child of the attributeSelectorRef,
     // if it is a click on the attributeSelectorRef we should stop propagation
-
     //if (attributeSelectorRef.current && !(attributeSelectorRef.current as Node).contains(event.target as Node)) {
     //  setIsFilterVisible(false);
     //}
   };
 
   useEffect(() => {
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []); 
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     fetchAllItems({
@@ -74,81 +73,50 @@ function HomePage() {
         other.
       </p>
 
-      <CitySearchComponent
-        messageText="Enter a city:"
-        storeLocation={true}
-        onChange={(l: Location): void => setLocation(l)}
-      />
-
-      <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4">
-        <label className="label">
-          <span className="label-text">Search Radius (miles):</span>
-        </label>
+      <div className="flex flex-col md:flex-row justify-center items-center gap-4">
         <input
-          type="number"
-          value={selectedRadius}
-          onChange={(e) => setSelectedRadius(Number(e.target.value))}
-          className="input input-bordered w-full max-w-xs"
-          min="1"
+          type="text"
+          placeholder="Search for items..."
+          className="input input-bordered input-lg w-full max-w-lg mx-auto"
         />
+      </div>
+
+      <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4 mt-4">
+        <div className="flex items-center">
+          <label className="label text-sm md:text-base">
+            <span className="label-text">In Region:</span>
+          </label>
+          <CitySearchComponent
+            messageText=""
+            storeLocation={true}
+            onChange={(l: Location): void => setLocation(l)}
+          />
+        </div>
+
+        <div className="flex items-center gap-2">
+          <label className="label text-sm md:text-base">
+            <span className="label-text">Search Radius (miles):</span>
+          </label>
+          <input
+            type="number"
+            value={selectedRadius}
+            onChange={(e) => setSelectedRadius(Number(e.target.value))}
+            className="input input-bordered w-full w-24"
+            min="1"
+          />
+        </div>
+
         <button
           className="btn btn-primary"
           onClick={() => setIsFilterVisible(!isFilterVisible)}
         >
-          Filter
+          All Filters
         </button>
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search for items or categories..."
-          className="input input-bordered input-lg w-full max-w-md"
-        />
-        <div className="hidden md:block">
-          <div className="tabs tabs-boxed justify-center">
-            {categories.map((category) => (
-              <a
-                key={category}
-                className={`tab ${
-                  selectedCategory === category ? "tab-active" : ""
-                }`}
-                onClick={() => setSelectedCategory(category)}
-              >
-                {category}
-              </a>
-            ))}
-            <a
-              className={`tab ${
-                selectedCategory === "All" ? "tab-active" : ""
-              }`}
-              onClick={() => setSelectedCategory("All")}
-            >
-              All
-            </a>
-          </div>
-        </div>
-        <div className="md:hidden">
-          <select
-            value={selectedCategory}
-            onChange={handleCategoryChange}
-            className="select select-bordered w-full max-w-md"
-          >
-            <option value="All">All Categories</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
-        </div>
       </div>
 
       <div
         className={`fixed inset-0 z-40 transform ${
-          isFilterVisible
-            ? "translate-x-0"
-            : "-translate-x-full md:-translate-x-full"
+          isFilterVisible ? "translate-x-0" : "-translate-x-full"
         } transition-transform ease-in-out duration-300 ${
           isFilterVisible ? "w-full md:w-64" : "w-0"
         } bg-white shadow-xl overflow-hidden`}
