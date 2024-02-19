@@ -54,11 +54,14 @@ const ConversationsPage: React.FC = () => {
           }
           return acc;
         }, []);
-        
-        const participantsMap = successfulDetails.reduce<Record<string, User>>((acc, userDetail) => {
-          acc[userDetail.id] = userDetail;
-          return acc;
-        }, {});
+
+        const participantsMap = successfulDetails.reduce<Record<string, User>>(
+          (acc, userDetail) => {
+            acc[userDetail.id] = userDetail;
+            return acc;
+          },
+          {}
+        );
 
         setParticipants(participantsMap);
       } catch (error) {
@@ -99,19 +102,25 @@ const ConversationsPage: React.FC = () => {
             >
               <div className="flex items-center gap-2">
                 <ProfilePictureOrInitial user={otherUser} />
-                <div>
-                  <div className="font-bold">
-                    {otherUser?.name || "Unknown"}
+                <div className="flex flex-col flex-grow">
+                  <div className="flex justify-between items-center">
+                    <span className="font-bold">
+                      {otherUser?.name || "Unknown"}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {new Date(message.sentAt).toLocaleTimeString()}
+                    </span>
                   </div>
-                  <div className="text-sm text-gray-600 overflow-ellipsis overflow-hidden whitespace-nowrap max-w-[200px]">
-                    {/* Check if the current user is the sender. If so, prepend "You: " to the message text. */}
-                    {message.senderID === user?.id ? `You: ${message.text}` : message.text}
+
+                  <div className="text-sm text-gray-600 overflow-ellipsis overflow-hidden whitespace-nowrap">
+                    {message.senderID === user?.id
+                      ? `You: ${message.text}`
+                      : message.text}
                   </div>
                 </div>
               </div>
             </li>
           );
-          
         })}
       </ul>
     </div>
