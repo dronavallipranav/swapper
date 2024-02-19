@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Item } from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
 import CitySearchComponent from "../components/CitySearch";
@@ -21,6 +21,21 @@ function HomePage() {
   const [selectedRadius, setSelectedRadius] = useState<number>(10);
   const [location, setLocation] = useState<Location>();
   const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const attributeSelectorRef = useRef(null);
+
+  const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
+    // check if its a child of the attributeSelectorRef,
+    // if it is a click on the attributeSelectorRef we should stop propagation
+
+    //if (attributeSelectorRef.current && !(attributeSelectorRef.current as Node).contains(event.target as Node)) {
+    //  setIsFilterVisible(false);
+    //}
+  };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []); 
 
   useEffect(() => {
     fetchAllItems({
@@ -137,6 +152,7 @@ function HomePage() {
         } transition-transform ease-in-out duration-300 ${
           isFilterVisible ? "w-full md:w-64" : "w-0"
         } bg-white shadow-xl overflow-hidden`}
+        ref={attributeSelectorRef}
       >
         <div className="flex justify-between items-center p-4 border-b">
           <h2 className="text-lg font-semibold">Filters</h2>
