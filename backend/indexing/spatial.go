@@ -23,11 +23,13 @@ func NewSpatialIndex() *ravendb.IndexCreationTask {
 		"    item = item\n" +
 		"}).Select(this0 => new {\n" +
 		"    this0 = this0,\n" +
+		"    title = this0.item.title,\n" +
 		"    lat = ((double)(this0.item.location.latitude ?? 0))\n" +
 		"}).Select(this1 => new {\n" +
 		"    this1 = this1,\n" +
 		"    lng = ((double)(this1.this0.item.location.longitude ?? 0))\n" +
 		"}).Select(this2 => new {\n" +
+		"    title = this2.this1.title,\n" +
 		"    latitude = this2.this1.lat,\n" +
 		"    longitude = this2.lng,\n" +
 		"    coordinates = this.CreateSpatialField(((double ? ) this2.this1.lat), ((double ? ) this2.lng))\n" +

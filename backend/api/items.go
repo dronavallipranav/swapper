@@ -217,37 +217,44 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	//filter for attributes on items
 	condition := c.Query("condition")
 	if condition != "" {
-		q = q.WhereEquals("Attributes.Condition", condition)
+		q = q.WhereEquals("attributes.Condition", condition)
 	}
 
 	size := c.Query("size")
 	if size != "" {
-		q = q.WhereEquals("Attributes.Size", size)
+		q = q.WhereEquals("attributes.Size", size)
 	}
 
 	color := c.Query("color")
 	if color != "" {
-		q = q.WhereEquals("Attributes.Color", color)
+		q = q.WhereEquals("attributes.Color", color)
 	}
 
 	listingType := c.Query("listingType")
 	if condition != "" {
-		q = q.WhereEquals("Attributes.listingType", listingType)
+		q = q.WhereEquals("attributes.listingType", listingType)
 	}
 
 	itemCategory := c.Query("itemCategory")
 	if size != "" {
-		q = q.WhereEquals("Attributes.itemCategory", itemCategory)
+		q = q.WhereEquals("attributes.itemCategory", itemCategory)
 	}
 
 	ownershipHistory := c.Query("ownershipHistory")
 	if color != "" {
-		q = q.WhereEquals("Attributes.ownershipHistory", ownershipHistory)
+		q = q.WhereEquals("attributes.ownershipHistory", ownershipHistory)
 	}
 
 	authenticity := c.Query("authenticity")
 	if color != "" {
-		q = q.WhereEquals("Attributes.authenticity", authenticity)
+		q = q.WhereEquals("attributes.authenticity", authenticity)
+	}
+
+	//fuzzy search for item name
+	search := c.Query("search")
+	fmt.Println(search)
+	if search != "" {
+		q = q.WhereEquals("title", search).Fuzzy(0.06)
 	}
 
 	q = q.Take(limit)

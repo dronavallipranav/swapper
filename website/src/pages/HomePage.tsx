@@ -1,10 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Item } from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
 import CitySearchComponent from "../components/CitySearch";
 import { Location } from "../services/LocationService";
 import AttributeSelector from "../components/AttributeSelect";
 import { useNavigate } from "react-router-dom";
+import { debounce } from 'lodash';
 
 const categories = [
   "Electronics",
@@ -21,6 +22,7 @@ function HomePage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedRadius, setSelectedRadius] = useState<number>(10);
   const [location, setLocation] = useState<Location>();
+  const [search, setSearch] = useState<string>("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const attributeSelectorRef = useRef(null);
   const nav = useNavigate();
@@ -38,8 +40,9 @@ function HomePage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  useEffect(() => {
+  const fetchItemsDebounced = useCallback(debounce((query) => {
     fetchAllItems({
+      ...query,
       latitude: location?.latitude || 43.0731,
       longitude: location?.longitude || -89.4012,
       radius: selectedRadius,
@@ -49,15 +52,23 @@ function HomePage() {
       skip: 0,
       sort: "title",
       order: "asc",
-      search: "",
+      search: search,
     })
-      .then((fetchedItems) => {
-        setItems(fetchedItems);
-      })
-      .catch((error) => {
-        console.error(error);
-      });
-  }, [selectedCategory, selectedRadius, location]);
+    .then(fetchedItems => {
+      setItems(fetchedItems);
+    })
+    .catch(error => {
+      console.error(error);
+    });
+  }, 300), [search, selectedCategory, selectedRadius, location]); //dependencies for the debounced function
+
+  useEffect(() => {
+    fetchItemsDebounced({ search });
+  }, [fetchItemsDebounced]); //call the debounced function when the search changes
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
 
   const handleCategoryChange = (
     event: React.ChangeEvent<HTMLSelectElement>
@@ -80,6 +91,7 @@ function HomePage() {
           type="text"
           placeholder="Search for items..."
           className="input input-bordered input-lg w-full max-w-lg mx-auto"
+          onChange = {handleSearchChange}
         />
       </div>
 
