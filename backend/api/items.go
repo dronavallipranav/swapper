@@ -211,8 +211,8 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	defer session.Close()
 
 	var items []*models.Item
-	q := session.QueryIndex("items/ByLocation")
-	q = q.WithinRadiusOf("coordinates", radius, lat, long)
+	q := session.QueryIndex("items/ByLocationAndAttributes")
+	q = q.WithinRadiusOf("Coordinates", radius, lat, long)
 
 	//filter for attributes on items
 	condition := c.Query("condition")
@@ -252,9 +252,16 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 
 	//fuzzy search for item name
 	search := c.Query("search")
-	fmt.Println(search)
 	if search != "" {
-		q = q.WhereEquals("title", search).Fuzzy(0.06)
+		searchTerm := search + " " // Your search term from the query parameter
+		fuzziness := "0.99"        // Fuzziness level, adjust as needed
+
+		// Constructing the fuzzy search query
+		fuzzyQuery := fmt.Sprintf("%s~%s", searchTerm, fuzziness)
+
+		// Executing the search with fuzziness
+		q = q.Search("Query", fuzzyQuery)
+
 	}
 
 	q = q.Take(limit)
