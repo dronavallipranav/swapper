@@ -4,23 +4,11 @@ import (
 	"github.com/ravendb/ravendb-go-client"
 )
 
-func geographySpatialOptions() *ravendb.SpatialOptions {
-	return &ravendb.SpatialOptions{
-		Type:         ravendb.SpatialFieldGeography,
-		Strategy:     ravendb.SpatialSearchStrategyGeohashPrefixTree,
-		MaxTreeLevel: 9,
-		Units:        ravendb.SpatialUnitsMiles,
-		MinX:         -180,
-		MaxX:         180,
-		MinY:         -90,
-		MaxY:         90,
-	}
-}
-
-func NewItemsWithSpatialAndFullTextSearchIndex() *ravendb.IndexCreationTask {
-	indexName := "Items/ByLocationAndAttributes"
+func NewItemsFullTextSearchIndex() *ravendb.IndexCreationTask {
+	indexName := "Items/ByFullTextAndAttributes"
 	res := ravendb.NewIndexCreationTask(indexName)
 
+	// Mapping fields from the Item model including nested Attributes for full-text search
 	res.Map = `
 from item in docs.Items
 select new {
@@ -38,17 +26,15 @@ select new {
         item.categories
     },
     item.location,
-    Coordinates = this.CreateSpatialField(item.location.latitude, item.location.longitude)
 }`
-	// Configure index options
+
+	// Configure the index field options for full-text search
 	res.Index("Query", ravendb.FieldIndexingSearch)
-	res.Analyze("Query", "StandardAnalyzer")
-	res.Spatial("Coordinates", geographySpatialOptions)
+	res.Analyze("Query", "StandardAnalyzer") // Use an appropriate analyzer for your needs
 
 	// Store fields for retrieval
 	res.Store("title", ravendb.FieldStorageYes)
 	res.Store("description", ravendb.FieldStorageYes)
-	res.Store("location", ravendb.FieldStorageYes)
 
 	return res
 }
