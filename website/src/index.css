@@ -2,19 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
-.sidebar {
-    overflow-y: auto;
-    scrollbar-width: none; /* For Firefox */
-  }
-  
-  .sidebar::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Opera */
-  }
-  
-  .sidebar:hover {
-    scrollbar-width: auto; /* For Firefox */
-  }
-  
-  .sidebar:hover::-webkit-scrollbar {
-    display: block; /* For Chrome, Safari, and Opera */
-  }
+::-webkit-scrollbar {
+    width: 0px;
+}
+::-webkit-scrollbar-track {
+    -webkit-box-shadow: none;
+}
+::-webkit-scrollbar-thumb {
+    background: white;
+    -webkit-box-shadow: none;
+}
+
+::-webkit-scrollbar-thumb:window-inactive {
+    background: none;
+}
