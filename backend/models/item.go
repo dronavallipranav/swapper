@@ -33,4 +33,6 @@ type Item struct {
 	Attachments []string   `json:"attachments"`
 	Attributes  Attributes `json:"attributes"`
 	CreatedAt   time.Time  `json:"createdAt"`
+	AvgRating   float64    `json:"avgRating"`
+	NumRatings  int        `json:"numRatings"`
 }

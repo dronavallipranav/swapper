@@ -39,6 +39,7 @@ func (h *ItemHandler) RegisterItemRoutes(r *gin.Engine) {
 	items.GET("/:id", h.GetItem)
 	items.DELETE("/:id", middleware.AuthMiddleware(), h.DeleteItem)
 	items.GET("/attributes", h.GetAttributes)
+	items.GET("/:id/ratings", h.GetItemRatings)
 }
 
 type AddItemRequest struct {
@@ -325,6 +326,29 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 
 	// attach the first image to each item
 	for _, item := range items {
+		var ratings []*models.Rating
+		ratingsQuery := session.QueryCollection("Ratings") // Adjust if you have a specific collection name for ratings
+		ratingsQuery = ratingsQuery.WhereEquals("RecipientID", item.ID).AndAlso().WhereEquals("RecipientIsItem", true)
+		err = ratingsQuery.GetResults(&ratings)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings for item"})
+			continue
+		}
+
+		totalRatings := len(ratings)
+		var sumRatings int
+		for _, rating := range ratings {
+			sumRatings += rating.Stars
+		}
+		avgRating := float64(0)
+		if totalRatings > 0 {
+			avgRating = float64(sumRatings) / float64(totalRatings)
+		}
+
+		item.NumRatings = totalRatings
+		item.AvgRating = avgRating
+
 		attachmentData, err := getItemAttachments(c, 1, item, session)
 		if err != nil {
 			return // error is already added to gin context
@@ -352,6 +376,29 @@ func (h *ItemHandler) GetItem(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Item not found"})
 		return
 	}
+
+	var ratings []*models.Rating
+	ratingsQuery := session.QueryCollection("Ratings") // Adjust if you have a specific collection name for ratings
+	ratingsQuery = ratingsQuery.WhereEquals("RecipientID", id).AndAlso().WhereEquals("RecipientIsItem", true)
+	err = ratingsQuery.GetResults(&ratings)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings for item"})
+		return
+	}
+
+	totalRatings := len(ratings)
+	var sumRatings int
+	for _, rating := range ratings {
+		sumRatings += rating.Stars
+	}
+	avgRating := float64(0)
+	if totalRatings > 0 {
+		avgRating = float64(sumRatings) / float64(totalRatings)
+	}
+
+	item.NumRatings = totalRatings
+	item.AvgRating = avgRating
 
 	attachmentData, err := getItemAttachments(c, -1, item, session)
 	if err != nil {
@@ -458,4 +505,27 @@ func capitalizeFirstLetter(s string) string {
 		return s
 	}
 	return strings.ToUpper(s[:1]) + s[1:]
+}
+
+func (h *ItemHandler) GetItemRatings(c *gin.Context) {
+	itemID := "items/" + c.Param("id") // Ensure this matches how you store item IDs in ratings
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var ratings []*models.Rating
+	// Assuming "Ratings" is your collection name and "RecipientID" refers to the item being rated
+	ratingsQuery := session.QueryCollection("Ratings").WhereEquals("RecipientID", itemID).AndAlso().WhereEquals("RecipientIsItem", true)
+	err = ratingsQuery.GetResults(&ratings)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings for item"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ratings": ratings}) // Directly return the ratings
 }
