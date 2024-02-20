@@ -41,10 +41,31 @@ const HomeHeader: React.FC<HeaderProps> = ({
         {/* Left Section: Logo and Mobile Menu Toggle */}
         <div className="flex items-center space-x-4">
           <button className="btn btn-ghost lg:hidden" onClick={toggleMenu}>
-            {/* SVG Icon */}
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16m-7 6h7" />
+          </svg>
           </button>
           <Link to="/" className="btn btn-ghost normal-case text-xl">Swapper</Link>
+      </div>
+
+      {/* Sidebar Menu for Mobile */}
+      <div className={`fixed inset-y-0 left-0 transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} w-64 z-20 transition duration-300 ease-in-out bg-white shadow-md lg:hidden`}>
+        <div className="p-5">
+          <Link to="/about" className="block py-2">About</Link>
+          {isAuthenticated && (
+            <>
+              <Link to="/messages" className="block py-2">Messages</Link>
+              <Link to="/items/create" className="block py-2">List Item</Link>
+            </>
+          )}
+          {!isAuthenticated && (
+            <>
+              <Link to="/login" className="block py-2">Login</Link>
+              <Link to="/register" className="block py-2">Register</Link>
+            </>
+          )}
         </div>
+      </div>
 
         {/* Right Section: Desktop Links and Profile/User Menu */}
         <div className="flex items-center space-x-4">
@@ -79,55 +100,96 @@ const HomeHeader: React.FC<HeaderProps> = ({
         </div>
       </div>
 
-      {/* Additional adjustments for mobile menu and overlay */}
+    
       <div className={`fixed inset-y-0 left-0 transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} transition duration-300 ease-in-out bg-white shadow-md lg:hidden`}>
-        {/* Mobile navigation */}
+       
       </div>
       {isMenuOpen && <div className="fixed inset-0 bg-black bg-opacity-50 z-10 lg:hidden" onClick={toggleMenu}></div>}
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4 mt-4">
-        {/* Combined Search Field */}
-        <div className="flex items-center gap-2 w-full max-w-4xl">
-          {/* Main Search Field */}
-          <input
-            type="text"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search for items..."
-            className="input input-bordered flex-grow rounded-l-full"
-          />
-
-          {/* Vertical Separator */}
-          <div className="px-2">|</div>
-
-          {/* CitySearchComponent */}
-          <CitySearchComponent
-            messageText=""
-            storeLocation={true}
-            onChange={(l: Location): void => setLocation(l)}
-          />
-
-          {/* Vertical Separator */}
-          <div className="px-2">|</div>
-
-          {/* Search Radius Input */}
-          <input
-            type="number"
-            value={selectedRadius}
-            onChange={(e) => setSelectedRadius(Number(e.target.value))}
-            className="input input-bordered w-24"
-            placeholder="Radius"
-            min="1"
-          />
-          <button
-          className="btn btn-primary"
-          onClick={() => setIsFilterVisible(!isFilterVisible)}
-        >
-          All Filters
-        </button>
-          {/* If you have a button or icon to trigger search, it can go here, with rounded-r-full to complement the rounded left of the search input */}
-        </div>
-      </div>
+       {/* Adjusted Combined Search Field for Mobile Optimization */}
+       <div className="md:hidden flex flex-col items-center gap-2 w-full px-4">
+  
+  <input
+    type="text"
+    value={search}
+    onChange={(e) => setSearch(e.target.value)}
+    placeholder="Search for items..."
+    className="bg-white rounded-full shadow w-full px-4 py-2 focus:outline-none"
+  />
+  
+  <div className="flex flex-col items-center gap-2 w-full">
+    <div className="w-full flex justify-between px-4 py-2 bg-white rounded-full shadow">
+      <label className="text-sm font-semibold">Region:</label>
+      
+      <CitySearchComponent
+        messageText=""
+        storeLocation={true}
+        onChange={(l: Location): void => setLocation(l)}
+      />
     </div>
+    <div className="w-full flex justify-between px-4 py-2 bg-white rounded-full shadow">
+      <label className="text-sm font-semibold">Radius (miles):</label>
+      <input
+        type="number"
+        value={selectedRadius}
+        onChange={(e) => setSelectedRadius(Number(e.target.value))}
+        className="bg-transparent focus:outline-none"
+        placeholder="Radius"
+        min="1"
+      />
+    </div>
+  </div>
+  
+  <button
+    className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-4 py-2"
+    onClick={() => setIsFilterVisible(!isFilterVisible)}
+  >
+    All Filters
+  </button>
+</div>
+       <div className="hidden mt-4 md:flex justify-center items-center gap-2 w-full px-4">
+    <div className="flex items-center bg-white rounded-full shadow w-full max-w-4xl flex-wrap">
+      
+      <input
+        type="text"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search for items..."
+        className="flex-grow bg-transparent lg:pl-4 focus:outline-none rounded-l-full"
+      />
+
+      
+      <div className="flex items-center w-full md:w-auto px-4 py-2">
+        <label className="text-sm font-semibold mr-2">Region:</label>
+        <CitySearchComponent
+          messageText=""
+          storeLocation={true}
+          onChange={(l: Location): void => setLocation(l)}
+        />
+      </div>
+      
+      <span className="hidden md:block text-gray-400 mx-2">|</span>
+      
+      <div className="flex items-center w-full md:w-auto px-4 py-2">
+        <label className="text-sm font-semibold mr-2">Radius (miles):</label>
+        <input
+          type="number"
+          value={selectedRadius}
+          onChange={(e) => setSelectedRadius(Number(e.target.value))}
+          className="bg-transparent focus:outline-none w-full md:w-24"
+          placeholder="Radius"
+          min="1"
+        />
+      </div>
+      
+      <button
+        className="ml-4 mr-4 text-white bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-4 py-2 flex-shrink-0"
+        onClick={() => setIsFilterVisible(!isFilterVisible)}
+      >
+        All Filters
+      </button>
+    </div>
+  </div>
+</div>
     
     
   );
