@@ -17,12 +17,17 @@ const categories = [
   "Other",
 ];
 
-function HomePage() {
+interface HomeProps {
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const HomePage : React.FC<HomeProps> = ({ search, setSearch }) => {
   const [items, setItems] = useState<Item[] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [selectedRadius, setSelectedRadius] = useState<number>(10);
   const [location, setLocation] = useState<Location>();
-  const [search, setSearch] = useState<string>("");
+
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const attributeSelectorRef = useRef(null);
   const [attributes, setAttributes] = useState<Record<string, string[]>>({});
@@ -89,14 +94,6 @@ function HomePage() {
       <h1 className="text-4xl font-bold text-center mb-6">
         Swapper
       </h1>
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search for items..."
-          className="input input-bordered input-lg w-full max-w-lg mx-auto"
-          onChange = {handleSearchChange}
-        />
-      </div>
 
       <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4 mt-4">
         <div className="flex items-center">
