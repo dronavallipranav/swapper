@@ -3,11 +3,20 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import ProfilePictureOrInitial from './ProfilePictureOrInitial';
 
-const Header = () => {
+interface HeaderProps {
+  search: string;
+  setSearch: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const Header:  React.FC<HeaderProps> = ({search, setSearch}) => {
   const { isAuthenticated, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
 
   return (
     <div className="flex justify-between items-center bg-base-100 border-2 border-base-200 px-4 py-2">
@@ -20,7 +29,7 @@ const Header = () => {
         <Link to="/" className="btn btn-ghost normal-case text-xl">
           Swapper
         </Link>
-        
+
         {/* Sidebar Menu for Desktop */}
         <div className="hidden lg:flex">
           <Link to="/about" className="btn btn-ghost normal-case text-xl">About</Link>
@@ -32,7 +41,13 @@ const Header = () => {
           )}
           </div>
       </div>
-
+      <input
+        type="text"
+        value={search}
+        onChange={handleSearchChange}
+        placeholder="Search for items..."
+        className="input input-bordered input-lg"
+      />
       {/* Sidebar Menu for Mobile */}
       <div className={`fixed inset-y-0 left-0 transform ${isMenuOpen ? "translate-x-0" : "-translate-x-full"} w-64 z-20 transition duration-300 ease-in-out bg-white shadow-md lg:hidden`}>
         <div className="p-5">

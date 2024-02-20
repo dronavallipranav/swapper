@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -15,15 +16,16 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { NewItemPage } from "./pages/Items/NewItemPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
+  const [search, setSearch] = useState('');
   return (
     <>
       <div className="min-h-screen">
         <AuthProvider>
           <BrowserRouter>
-            <Header />
+            <Header search ={search} setSearch={setSearch}/>
             <Routes>
               {/* Main Pages */}
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<HomePage search ={search} setSearch={setSearch} />} />
               <Route path="/about" element={<AboutPage />} />
 
               {/* Item Routes */}
