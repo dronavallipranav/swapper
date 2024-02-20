@@ -10,7 +10,7 @@ const Header = () => {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <div className="flex justify-between items-center bg-base-100 px-4 py-2">
+    <div className="flex justify-between items-center bg-base-100 border-2 border-base-200 px-4 py-2">
       <div className="flex items-center">
         <button className="btn btn-ghost lg:hidden" onClick={toggleMenu}>
           <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
