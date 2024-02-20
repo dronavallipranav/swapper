@@ -35,6 +35,7 @@ func (h *UserHandler) RegisterUserRoutes(r *gin.Engine) {
 	r.POST("/login", h.LoginUser)
 	r.PUT("/user", middleware.AuthMiddleware(), h.UpdateUser)
 	r.GET("/users/:id", h.GetUser)
+	r.GET("/users/:id/ratings", middleware.AuthMiddleware(), h.GetUserRatings)
 }
 
 type SignUpRequest struct {
@@ -421,6 +422,26 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 		return
 	}
 
+	// Calculate average and total number of ratings
+	var ratings []*models.Rating
+	q := session.QueryCollection("Ratings") // Adjust the collection name as necessary
+	q = q.WhereEquals("RecipientID", userID)
+	err = q.GetResults(&ratings)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings"})
+		return
+	}
+
+	totalRatings := len(ratings)
+	var sumRatings int
+	for _, rating := range ratings {
+		sumRatings += rating.Stars
+	}
+	avgRating := float64(0)
+	if totalRatings > 0 {
+		avgRating = float64(sumRatings) / float64(totalRatings)
+	}
+
 	// read attachments
 	attachments, err := session.Advanced().Attachments().GetNames(u)
 	if err != nil {
@@ -450,6 +471,32 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 		u.ProfilePicture = base64Encoded
 	}
 
+	u.AvgRating = avgRating
+	u.NumRatings = totalRatings
 	u.PasswordHash = ""
 	c.JSON(http.StatusOK, gin.H{"user": u})
+}
+
+func (h *UserHandler) GetUserRatings(c *gin.Context) {
+	userID := c.Param("id") // Assuming you want to fetch ratings for the user specified in the URL
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var ratings []*models.Rating
+	q := session.QueryCollection("ratings") // Adjust if you have a specific collection name
+
+	// Example: Fetching ratings where the user is the recipient. Adjust logic as needed.
+	q = q.WhereEquals("RecipientID", userID)
+	err = q.GetResults(&ratings)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"ratings": ratings})
 }

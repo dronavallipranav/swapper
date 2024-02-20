@@ -23,5 +23,7 @@ export interface Item {
     location?: Location;
     attributes?: Attributes;
     createdAt: string;
+    avgRating?: number;
+    numRatings?: number;
 }
 

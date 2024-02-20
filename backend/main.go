@@ -61,4 +61,7 @@ func setupRoutes(r *gin.Engine, store *ravendb.DocumentStore) {
 
 	messageHandler := api.NewMessageHandler(store)
 	messageHandler.RegisterMessageRoutes(r)
+
+	ratingHandler := api.NewRatingHandler(store)
+	ratingHandler.RegisterRatingRoutes(r)
 }
