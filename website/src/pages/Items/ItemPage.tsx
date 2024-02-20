@@ -47,7 +47,8 @@ const ItemPage = () => {
   const handleSendMessage = async () => {
     if (item && user) {
       try {
-        await sendMessage(user.id, message);
+        console.log(item.userId, message);
+        await sendMessage(item.userId, message);
         setIsModalOpen(false);
         nav("/messages");
       } catch (error) {
