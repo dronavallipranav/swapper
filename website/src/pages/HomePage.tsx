@@ -85,37 +85,33 @@ function HomePage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-4xl font-bold text-center mb-6">
-        Community Marketplace
-      </h1>
-      <p className="text-lg text-center mb-8">
-        A place to give and find free items, reducing waste and helping each
-        other.
-      </p>
-
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4">
+    <div className="flex flex-col lg:flex-row">
+      <div className={`siderbar lg:block ${isFilterVisible ? "block" : "hidden"} lg:w-1/4 xl:w-1/5 bg-white p-4 lg:sticky lg:top-0 lg:h-screen overflow-y-auto no-scrollbar`}>
+        {/* Dynamically display the selected category or "Filters" */}
+        <h1 className="text-xl lg:text-4xl font-bold mb-6">{selectedCategory !== "All" ? selectedCategory : "Filters"}</h1>
         <input
           type="text"
           placeholder="Search for items..."
-          className="input input-bordered input-lg w-full max-w-lg mx-auto"
-          onChange = {handleSearchChange}
+          className="input input-bordered input-lg w-full mb-4"
+          onChange={(e) => setSearch(e.target.value)}
         />
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4 mt-4">
-        <div className="flex items-center">
-          <label className="label text-sm md:text-base">
-            <span className="label-text">In Region:</span>
-          </label>
-          <CitySearchComponent
-            messageText=""
-            storeLocation={true}
-            onChange={(l: Location): void => setLocation(l)}
-          />
+        <div className="mb-4 flex flex-wrap gap-2">
+          {["All", ...categories].map((category) => (
+            <button
+              key={category}
+              className={`btn ${selectedCategory === category ? "btn-primary" : "btn-outline"} rounded-full hover:shadow-lg`}
+              onClick={() => setSelectedCategory(category)}
+            >
+              {category}
+            </button>
+          ))}
         </div>
-
-        <div className="flex items-center gap-2">
+        <CitySearchComponent
+          messageText=""
+          storeLocation={true}
+          onChange={(l) => setLocation(l)}
+        />
+        <div className="flex items-center gap-2 my-4">
           <label className="label text-sm md:text-base">
             <span className="label-text">Search Radius (miles):</span>
           </label>
@@ -127,51 +123,12 @@ function HomePage() {
             min="1"
           />
         </div>
-
-        <button
-          className="btn btn-primary"
-          onClick={() => setIsFilterVisible(!isFilterVisible)}
-        >
-          All Filters
-        </button>
+        <AttributeSelector onAttributesChange={updateAttributes} />
       </div>
 
-      <div
-        className={`fixed inset-0 z-40 transform ${
-          isFilterVisible ? "translate-x-0" : "-translate-x-full"
-        } transition-transform ease-in-out duration-300 ${
-          isFilterVisible ? "w-full md:w-64" : "w-0"
-        } bg-white shadow-xl overflow-hidden`}
-        ref={attributeSelectorRef}
-      >
-        <div className="flex justify-between items-center p-4 border-b">
-          <h2 className="text-lg font-semibold">Filters</h2>
-          <button
-            onClick={() => setIsFilterVisible(false)}
-            className="btn btn-square btn-sm"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={2}
-              stroke="currentColor"
-              className="w-6 h-6"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-  
-          <AttributeSelector onAttributesChange={updateAttributes} />
-          
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">
+      {/* Main Content Area */}
+      <div className="flex-1 bg-gray-50">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 px-10 gap-6 xl:grid-cols-4 justify-items-center">
         {items &&
           items.map((item) => (
             <div
@@ -217,9 +174,10 @@ function HomePage() {
               </div>
             </div>
           ))}
+        </div>
       </div>
     </div>
   );
-}
+                      }
 
 export default HomePage;

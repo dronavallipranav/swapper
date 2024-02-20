@@ -1,3 +1,20 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.sidebar {
+    overflow-y: auto;
+    scrollbar-width: none; /* For Firefox */
+  }
+  
+  .sidebar::-webkit-scrollbar {
+    display: none; /* For Chrome, Safari, and Opera */
+  }
+  
+  .sidebar:hover {
+    scrollbar-width: auto; /* For Firefox */
+  }
+  
+  .sidebar:hover::-webkit-scrollbar {
+    display: block; /* For Chrome, Safari, and Opera */
+  }
