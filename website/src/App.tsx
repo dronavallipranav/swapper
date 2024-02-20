@@ -7,7 +7,6 @@ import ItemPage from "./pages/Items/ItemPage";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProfileSettings from "./pages/profile/ProfileSettings";
-
 import MessagePanel from "./components/MessagePanel";
 import ConversationsPage from "./pages/ConversationsPage";
 import LogoutPage from "./pages/LogoutPage";
@@ -16,16 +15,15 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { NewItemPage } from "./pages/Items/NewItemPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
-  const [search, setSearch] = useState('');
+
   return (
     <>
       <div className="min-h-screen">
         <AuthProvider>
           <BrowserRouter>
-            <Header search ={search} setSearch={setSearch}/>
             <Routes>
               {/* Main Pages */}
-              <Route path="/" element={<HomePage search ={search} setSearch={setSearch} />} />
+              <Route path="/" element={<HomePage/>} />
               <Route path="/about" element={<AboutPage />} />
 
               {/* Item Routes */}

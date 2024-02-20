@@ -3,7 +3,7 @@ import { createItem, fetchItemAttributes } from "../../services/ItemService";
 import { useNavigate } from "react-router-dom";
 import { Location } from "../../services/LocationService";
 import CitySearchComponent from "../../components/CitySearch";
-
+import Header from "../../components/Header";
 export const NewItemPage = () => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -91,6 +91,8 @@ export const NewItemPage = () => {
 
 
   return (
+    <div>
+      <Header/>
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="w-full px-8 py-6 mt-4 text-left bg-white shadow-lg sm:w-3/4 md:w-2/3 lg:w-1/2 xl:max-w-3xl mx-auto">
         <h3 className="text-2xl font-bold text-center">List New Item</h3>
@@ -260,6 +262,7 @@ export const NewItemPage = () => {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };
