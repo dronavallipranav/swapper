@@ -76,8 +76,22 @@ const CitySearchComponent: React.FC<CitySearchComponentProps> = ({
       )}
       <AsyncSelect
         defaultOptions
+        classNamePrefix="async-select"
         loadOptions={loadOptions}
         onChange={handleChange}
+        styles={{
+          control: (provided) => ({
+            ...provided,
+            width: '100%',
+            maxWidth: '200px',
+          }),
+          valueContainer: (provided) => ({
+            ...provided,
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis',
+          }),
+        }}
       />
     </div>
   );
