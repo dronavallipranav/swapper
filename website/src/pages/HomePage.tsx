@@ -6,16 +6,6 @@ import AttributeSelector from "../components/AttributeSelect";
 import { useNavigate } from "react-router-dom";
 import { debounce } from 'lodash';
 import HomeHeader from "../components/HomeHeader";
-const categories = [
-  "Electronics",
-  "Clothing",
-  "Toys",
-  "Home and Garden",
-  "Sports",
-  "Books",
-  "Other",
-];
-
 
 const HomePage = () => {
   const [items, setItems] = useState<Item[] | null>(null);
@@ -95,6 +85,8 @@ const HomePage = () => {
                     setSelectedRadius={setSelectedRadius}
                     isFilterVisible={isFilterVisible}
                     setIsFilterVisible={setIsFilterVisible}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
                     />
     <div className="container mx-auto px-4 py-10">
  

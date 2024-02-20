@@ -4,6 +4,21 @@ import { useAuth } from '../contexts/AuthContext';
 import ProfilePictureOrInitial from './ProfilePictureOrInitial';
 import CitySearchComponent from './CitySearch';
 import { Location } from "../services/LocationService";
+import ElectronicsIcon from '../assets/Electronics.svg';
+import ClothingIcon from '../assets/Clothing.svg';
+import BooksIcon from '../assets/Books.svg';
+import HomeGardenIcon from '../assets/Garden.svg';
+import SportsIcon from '../assets/Sports.svg';
+import ToysIcon from '../assets/Toys.svg';
+
+const categoryIcons : Record<string, string> = {
+  Electronics: ElectronicsIcon,
+  Clothing: ClothingIcon,
+  Books: BooksIcon,
+  "Home and Garden": HomeGardenIcon,
+  Sports: SportsIcon,
+  Toys: ToysIcon,
+};
 
 interface HeaderProps {
   search: string;
@@ -14,6 +29,8 @@ interface HeaderProps {
   setSelectedRadius: React.Dispatch<React.SetStateAction<number>>;
   isFilterVisible: boolean;
   setIsFilterVisible: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedCategory: string;
+  setSelectedCategory: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const HomeHeader: React.FC<HeaderProps> = ({
@@ -25,10 +42,21 @@ const HomeHeader: React.FC<HeaderProps> = ({
   setSelectedRadius,
   isFilterVisible,
   setIsFilterVisible,
+  selectedCategory,
+  setSelectedCategory,
 }) => {
   const { isAuthenticated, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-
+  const categories = [
+    "All",
+    "Electronics",
+    "Clothing",
+    "Toys",
+    "Home and Garden",
+    "Sports",
+    "Books",
+    "Other",
+  ];
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -189,6 +217,18 @@ const HomeHeader: React.FC<HeaderProps> = ({
       </button>
     </div>
   </div>
+  <div className="mt-4 flex justify-center flex-wrap gap-2">
+        {categories.map((category, index) => (
+          <button
+            key={index}
+            className={`btn ${selectedCategory === category ? 'btn-active' : ''}`}
+            onClick={() => setSelectedCategory(category)}
+          >
+            {categoryIcons[category] ? <img src={categoryIcons[category]} alt={category} className="w-4 h-4 mr-2" /> : null}
+            {category}
+          </button>
+        ))}
+      </div>
 </div>
     
     
