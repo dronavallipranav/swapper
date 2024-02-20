@@ -12,16 +12,19 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-      login({ email, password }).then((user) => {
+    login({ email, password })
+      .then((user) => {
         loginUser(user);
-        nav('/'); // Redirect to home page on successful login
-      }).catch((e) => {
-        if (e.response.data.error) {
-            setError(e.response.data.error);
-            return;
-        }
-        setError('An error occurred. Please try again.');
+        nav("/"); // Redirect to home page on successful login
       })
+      .catch((e) => {
+        console.log(e);
+        if (e.response.data.error) {
+          setError(e.response.data.error);
+          return;
+        }
+        setError("An error occurred. Please try again.");
+      });
   };
 
   return (
