@@ -425,7 +425,7 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	// Calculate average and total number of ratings
 	var ratings []*models.Rating
 	q := session.QueryCollection("Ratings") // Adjust the collection name as necessary
-	q = q.WhereEquals("RecipientID", userID)
+	q = q.WhereEquals("recipientID", userID)
 	err = q.GetResults(&ratings)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings"})
@@ -491,7 +491,7 @@ func (h *UserHandler) GetUserRatings(c *gin.Context) {
 	q := session.QueryCollection("ratings") // Adjust if you have a specific collection name
 
 	// Example: Fetching ratings where the user is the recipient. Adjust logic as needed.
-	q = q.WhereEquals("RecipientID", userID)
+	q = q.WhereEquals("recipientID", userID)
 	err = q.GetResults(&ratings)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings"})
