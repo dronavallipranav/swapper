@@ -97,7 +97,7 @@ const MessagePanel: React.FC = () => {
 <div ref={messagesEndRef} className="messages overflow-y-auto flex flex-col gap-2">
   {groupedMessages.length > 0 ? (
     groupedMessages.map((group, groupIndex) => (
-      <div key={groupIndex} className="flex flex-col gap-2">
+      <div key={groupIndex} className="flex flex-col">
         {group.messages.map((msg, index) => (
           <div
             key={index}
