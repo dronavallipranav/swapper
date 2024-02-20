@@ -38,7 +38,16 @@ select new {
         item.categories
     },
     item.location,
-    Coordinates = this.CreateSpatialField(item.location.latitude, item.location.longitude)
+    Coordinates = this.CreateSpatialField(item.location.latitude, item.location.longitude),
+	Attributes_Color = item.attributes.color,
+	Attributes_Condition = item.attributes.condition,
+	Attributes_ItemCategory = item.attributes.itemCategory,
+	Attributes_ListingType = item.attributes.listingType,
+	Attributes_Size = item.attributes.size,
+	Attributes_ShippingOptions = item.attributes.shippingOptions,
+	Attributes_OwnershipHistory = item.attributes.ownershipHistory,
+	Attributes_Authenticity = item.attributes.authenticity,
+	Categories = item.categories
 }`
 	// Configure index options
 	res.Index("Query", ravendb.FieldIndexingSearch)
@@ -49,6 +58,17 @@ select new {
 	res.Store("title", ravendb.FieldStorageYes)
 	res.Store("description", ravendb.FieldStorageYes)
 	res.Store("location", ravendb.FieldStorageYes)
+
+	// attr fields
+	res.Store("Attributes_Color", ravendb.FieldStorageYes)
+	res.Store("Attributes_Condition", ravendb.FieldStorageYes)
+	res.Store("Attributes_ItemCategory", ravendb.FieldStorageYes)
+	res.Store("Attributes_ListingType", ravendb.FieldStorageYes)
+	res.Store("Attributes_Size", ravendb.FieldStorageYes)
+	res.Store("Attributes_ShippingOptions", ravendb.FieldStorageYes)
+	res.Store("Attributes_OwnershipHistory", ravendb.FieldStorageYes)
+	res.Store("Attributes_Authenticity", ravendb.FieldStorageYes)
+	res.Store("Categories", ravendb.FieldStorageYes)
 
 	return res
 }
