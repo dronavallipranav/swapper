@@ -7,8 +7,8 @@ import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProfileSettings from "./pages/profile/ProfileSettings";
 
-import MessagePage from "./pages/MessagePage";
-
+import MessagePanel from "./components/MessagePanel";
+import ConversationsPage from "./pages/ConversationsPage";
 import LogoutPage from "./pages/LogoutPage";
 import Header from "./components/Header";
 import { AuthProvider } from "./contexts/AuthContext";
@@ -42,7 +42,7 @@ function App() {
                 path="/messages"
                 element={
                   <ProtectedRoute>
-                    <MessagePage />
+                    <ConversationsPage />
                   </ProtectedRoute>
                 }
               />
