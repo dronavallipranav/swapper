@@ -86,7 +86,7 @@ function HomePage() {
 
   return (
     <div className="flex flex-col lg:flex-row">
-      <div className={`siderbar lg:block ${isFilterVisible ? "block" : "hidden"} lg:w-1/4 xl:w-1/5 bg-white p-4 lg:sticky lg:top-0 lg:h-screen overflow-y-hidden hover:overflow-y-auto`}>
+      <div className={`siderbar lg:block ${isFilterVisible ? "block" : "hidden"} lg:w-1/4 xl:w-1/5 bg-white p-4 lg:sticky lg:top-0 lg:h-screen overflow-y-hidden hover:overflow-y-auto border-2 border-base-200`}>
         {/* Dynamically display the selected category or "Filters" */}
         <h1 className="text-xl lg:text-4xl font-bold mb-6">{selectedCategory !== "All" ? selectedCategory : "Filters"}</h1>
         <input
