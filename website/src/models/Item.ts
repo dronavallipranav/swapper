@@ -1,14 +1,13 @@
 import { Location } from "../services/LocationService";
 
 export interface Attributes {
-    condition?: string;
-    size?: string;
-    color?: string;
-    shippingOptions?: string[];
-    listingType?: string;
-    itemCategory?: string;
-    ownershipHistory?: string;
-    authenticity?: string;
+    condition?: string[];
+    size?: string[];
+    color?: string[];
+    listingType?: string[];
+    itemCategory?: string[];
+    ownershipHistory?: string[];
+    authenticity?: string[];
 }
 
 export interface Item {

@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -161,6 +162,16 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"id": newItem.ID})
 }
 
+type SetAttributes struct {
+	Condition        []string `json:"condition,omitempty"`
+	Size             []string `json:"size,omitempty"`
+	Color            []string `json:"color,omitempty"`
+	ListingType      []string `json:"listingType,omitempty"`
+	ItemCategory     []string `json:"itemCategory,omitempty"`
+	OwnershipHistory []string `json:"ownershipHistory,omitempty"`
+	Authenticity     []string `json:"authenticity,omitempty"`
+}
+
 /*
 Returns items based on filters
 
@@ -179,6 +190,7 @@ url params:
 TODO:
 */
 func (h *ItemHandler) GetItems(c *gin.Context) {
+
 	lat, err := strconv.ParseFloat(c.Query("lat"), 64)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid latitude"})
@@ -208,6 +220,16 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
 		return
 	}
+	attributesJSON := c.Query("attributes")
+	fmt.Println(attributesJSON)
+	var attributes map[string][]string
+	if attributesJSON != "" {
+		err := json.Unmarshal([]byte(attributesJSON), &attributes)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid attributes format"})
+			return
+		}
+	}
 	defer session.Close()
 
 	var items []*models.Item
@@ -220,35 +242,41 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 		q = q.WhereEquals("attributes.Condition", condition)
 	}
 
-	size := c.Query("size")
-	if size != "" {
-		q = q.WhereEquals("attributes.Size", size)
+	for key, values := range attributes {
+		for _, value := range values {
+			fmt.Println(key, value)
+			q = q.WhereEquals(fmt.Sprintf("attributes.%s", key), value)
+		}
 	}
+	// size := c.Query("size")
+	// if size != "" {
+	// 	q = q.WhereEquals("attributes.Size", size)
+	// }
 
-	color := c.Query("color")
-	if color != "" {
-		q = q.WhereEquals("attributes.Color", color)
-	}
+	// color := c.Query("color")
+	// if color != "" {
+	// 	q = q.WhereEquals("attributes.Color", color)
+	// }
 
-	listingType := c.Query("listingType")
-	if condition != "" {
-		q = q.WhereEquals("attributes.listingType", listingType)
-	}
+	// listingType := c.Query("listingType")
+	// if condition != "" {
+	// 	q = q.WhereEquals("attributes.listingType", listingType)
+	// }
 
-	itemCategory := c.Query("itemCategory")
-	if size != "" {
-		q = q.WhereEquals("attributes.itemCategory", itemCategory)
-	}
+	// itemCategory := c.Query("itemCategory")
+	// if size != "" {
+	// 	q = q.WhereEquals("attributes.itemCategory", itemCategory)
+	// }
 
-	ownershipHistory := c.Query("ownershipHistory")
-	if color != "" {
-		q = q.WhereEquals("attributes.ownershipHistory", ownershipHistory)
-	}
+	// ownershipHistory := c.Query("ownershipHistory")
+	// if color != "" {
+	// 	q = q.WhereEquals("attributes.ownershipHistory", ownershipHistory)
+	// }
 
-	authenticity := c.Query("authenticity")
-	if color != "" {
-		q = q.WhereEquals("attributes.authenticity", authenticity)
-	}
+	// authenticity := c.Query("authenticity")
+	// if color != "" {
+	// 	q = q.WhereEquals("attributes.authenticity", authenticity)
+	// }
 
 	//fuzzy search for item name
 	search := c.Query("search")

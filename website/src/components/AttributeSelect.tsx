@@ -44,7 +44,7 @@ const customSelectStyles = {
   }),
 };
 
-const AttributeSelector: React.FC = () => {
+const AttributeSelector: React.FC<{ onAttributesChange: Function }> = ({ onAttributesChange }) => {
   const [attributes, setAttributes] = useState<Attributes>({});
   const [selectedOptions, setSelectedOptions] = useState<Record<string, any[]>>({});
 
@@ -61,16 +61,23 @@ const AttributeSelector: React.FC = () => {
       setAttributes(attrs);
     };
     loadAttributes();
-  }, []);
+  }, [onAttributesChange]);
 
   const handleChange = (selected: any, attribute: string) => {
     setSelectedOptions((prevSelected) => ({
       ...prevSelected,
       [attribute]: selected || [],
     }));
+    
+  };
+
+  const applyFilters = () => {
+    onAttributesChange(selectedOptions);
   };
 
   return (
+    <div className="flex flex-col h-full">
+          <div className="overflow-y-auto p-4 flex-grow pb-16">
     <div className="space-y-4 p-4">
       {Object.entries(attributes).map(([attribute, options]) => {
         // Transform options for React Select
@@ -94,7 +101,17 @@ const AttributeSelector: React.FC = () => {
         );
       })}
     </div>
-  );
+    <div className="p-4 bg-white sticky bottom-0 shadow-inner">
+            <button
+              className="btn btn-primary w-full"
+              onClick={() => applyFilters()}
+            >
+              Apply Filters
+            </button>
+          </div>
+</div>
+</div>
+);
 };
 
 export default AttributeSelector;

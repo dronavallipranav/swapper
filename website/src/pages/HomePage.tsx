@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import { Item } from "../models/Item";
+import { Item, Attributes} from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
 import CitySearchComponent from "../components/CitySearch";
 import { Location } from "../services/LocationService";
@@ -25,7 +25,14 @@ function HomePage() {
   const [search, setSearch] = useState<string>("");
   const [isFilterVisible, setIsFilterVisible] = useState(false);
   const attributeSelectorRef = useRef(null);
+  const [attributes, setAttributes] = useState<Record<string, string[]>>({});
   const nav = useNavigate();
+
+
+  const updateAttributes = (newAttributes: Record<string, string[]>) => {
+    setAttributes(newAttributes);
+    console.log(newAttributes);
+  };
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     // check if its a child of the attributeSelectorRef,
@@ -41,6 +48,7 @@ function HomePage() {
   }, []);
 
   const fetchItemsDebounced = useCallback(debounce((query) => {
+    
     fetchAllItems({
       ...query,
       latitude: location?.latitude || 43.0731,
@@ -53,6 +61,7 @@ function HomePage() {
       sort: "title",
       order: "asc",
       search: search,
+      attributes: attributes
     })
     .then(fetchedItems => {
       setItems(fetchedItems);
@@ -60,12 +69,12 @@ function HomePage() {
     .catch(error => {
       console.error(error);
     });
-  }, 300), [search, selectedCategory, selectedRadius, location]); //dependencies for the debounced function
+  }, 300), [search, selectedCategory, selectedRadius, location, attributes]); //dependencies for the debounced function
 
   useEffect(() => {
     fetchItemsDebounced({ search });
   }, [fetchItemsDebounced]); //call the debounced function when the search changes
-  
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
@@ -158,19 +167,9 @@ function HomePage() {
             </svg>
           </button>
         </div>
-        <div className="flex flex-col h-full">
-          <div className="overflow-y-auto p-4 flex-grow pb-16">
-            <AttributeSelector />
-          </div>
-          <div className="p-4 bg-white sticky bottom-0 shadow-inner">
-            <button
-              className="btn btn-primary w-full"
-              onClick={() => setIsFilterVisible(false)}
-            >
-              Apply Filters
-            </button>
-          </div>
-        </div>
+  
+          <AttributeSelector onAttributesChange={updateAttributes} />
+          
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">
