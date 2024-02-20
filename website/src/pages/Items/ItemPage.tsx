@@ -7,6 +7,8 @@ import { Item } from "../../models/Item";
 import { User } from "../../models/User";
 import { getUser } from "../../services/AuthService";
 import ProfilePictureOrInitial from "../../components/ProfilePictureOrInitial";
+import RatingStars from "../../components/StarRating";
+import RatingRow from "../../components/RatingRow";
 
 const ItemPage = () => {
   let { itemID } = useParams();
@@ -111,6 +113,7 @@ const ItemPage = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {item?.title}
               </h2>
+              <RatingRow avgRating={item?.avgRating || 0} numRatings={item?.numRatings || 0} className="mb-2" />
               {item?.createdAt && (
                 <p className="text-sm text-gray-500 mb-4">
                   Posted on {new Date(item.createdAt).toLocaleDateString()} at{" "}
@@ -171,11 +174,13 @@ const ItemPage = () => {
 
               {!isItemOwner && !user && (
                 <button
-                className="btn btn-primary w-full"
-                onClick={() => {nav("/login")}}
-              >
-                Login to Contact Owner
-              </button>
+                  className="btn btn-primary w-full"
+                  onClick={() => {
+                    nav("/login");
+                  }}
+                >
+                  Login to Contact Owner
+                </button>
               )}
 
               {isItemOwner && (
