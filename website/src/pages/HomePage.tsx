@@ -87,13 +87,8 @@ function HomePage() {
   return (
     <div className="container mx-auto px-4 py-10">
       <h1 className="text-4xl font-bold text-center mb-6">
-        Community Marketplace
+        Swapper
       </h1>
-      <p className="text-lg text-center mb-8">
-        A place to give and find free items, reducing waste and helping each
-        other.
-      </p>
-
       <div className="flex flex-col md:flex-row justify-center items-center gap-4">
         <input
           type="text"
