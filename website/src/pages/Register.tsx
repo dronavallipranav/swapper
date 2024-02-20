@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { register } from '../services/AuthService';
 import { useAuth } from "../contexts/AuthContext";
-
+import Header from "../components/Header";
 const RegisterPage: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -27,6 +27,8 @@ const RegisterPage: React.FC = () => {
   };
 
   return (
+    <div>
+      <Header />
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="px-8 py-6 mt-4 text-left bg-white shadow-lg">
         <h3 className="text-2xl font-bold text-center">Create an account</h3>
@@ -73,6 +75,7 @@ const RegisterPage: React.FC = () => {
           </div>
         </form>
       </div>
+    </div>
     </div>
   );
 };

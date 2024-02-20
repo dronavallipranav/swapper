@@ -8,7 +8,7 @@ import { set } from "lodash";
 import { useNavigate } from "react-router-dom";
 import ProfilePictureOrInitial from "../components/ProfilePictureOrInitial";
 import { getUser } from "../services/AuthService";
-
+import Header from "../components/Header";
 const ConversationsPage: React.FC = () => {
   const { user } = useAuth();
   const [conversations, setConversations] = useState<Message[]>([]);
@@ -83,6 +83,8 @@ const ConversationsPage: React.FC = () => {
   }
 
   return (
+    <div>
+      <Header />
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Your Conversations</h1>
       <ul>
@@ -123,6 +125,7 @@ const ConversationsPage: React.FC = () => {
           );
         })}
       </ul>
+    </div>
     </div>
   );
 };

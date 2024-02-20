@@ -6,7 +6,7 @@ import { getUser } from "../services/AuthService";
 import api from "../services/AxiosInterceptor";
 import { Message } from "../models/Message";
 import { User } from "../models/User";
-
+import Header from "./Header";
 const MessagePanel: React.FC = () => {
   const { user } = useAuth();
   const currentUserID: string = user?.id as string;
@@ -93,6 +93,8 @@ const MessagePanel: React.FC = () => {
   }, [user, userID, messages]);
 
   return (
+    <div>
+      <Header />
     <div className="message-panel p-4 flex flex-col justify-between h-full bg-gray-100 min-h-screen">
 <div ref={messagesEndRef} className="messages overflow-y-auto flex flex-col gap-2">
   {groupedMessages.length > 0 ? (
@@ -155,6 +157,7 @@ const MessagePanel: React.FC = () => {
           Send
         </button>
       </div>
+    </div>
     </div>
   );
 };
