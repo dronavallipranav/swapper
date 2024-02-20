@@ -488,7 +488,9 @@ func (h *UserHandler) GetUserRatings(c *gin.Context) {
 	defer session.Close()
 
 	var ratings []*models.Rating
-	q := session.QueryCollection("Ratings")
+	q := session.QueryCollection("ratings") // Adjust if you have a specific collection name
+
+	// Example: Fetching ratings where the user is the recipient. Adjust logic as needed.
 	q = q.WhereEquals("recipientID", userID)
 	err = q.GetResults(&ratings)
 	if err != nil {
