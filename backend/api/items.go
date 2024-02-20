@@ -253,19 +253,29 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	//fuzzy search for item name
 	search := c.Query("search")
 	if search != "" {
-		searchTerm := search + " " // Your search term from the query parameter
-		fuzziness := "0.99"        // Fuzziness level, adjust as needed
-
-		// Constructing the fuzzy search query
+		/*searchTerm := search + " "
+		fuzziness := "0.9999999"
 		fuzzyQuery := fmt.Sprintf("%s~%s", searchTerm, fuzziness)
+		q = q.Search("Query", fuzzyQuery)*/
 
-		// Executing the search with fuzziness
-		q = q.Search("Query", fuzzyQuery)
+		q = q.Search("Query", "*"+search+"*~0.01")
 
+		//fuzziness := 0.99
+		//searchTerm := search
+
+		/*q = q.OpenSubclause()
+		attrs := []string{"Title", "Description"}
+		q = q.WhereEquals(attrs[0], searchTerm).Fuzzy(fuzziness)
+
+		i := 1
+		for i < len(attrs) {
+			attr := attrs[i]
+			q = q.OrElse().WhereEquals(attr, searchTerm).Fuzzy(fuzziness)
+		}
+		q = q.CloseSubclause()*/
 	}
 
 	q = q.Take(limit)
-
 	err = q.GetResults(&items)
 	if err != nil {
 		fmt.Println(err.Error())
