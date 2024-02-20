@@ -31,7 +31,6 @@ function HomePage() {
 
   const updateAttributes = (newAttributes: Record<string, string[]>) => {
     setAttributes(newAttributes);
-    console.log(newAttributes);
   };
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {

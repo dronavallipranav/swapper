@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"swapper/middleware"
 	"swapper/models"
 	"swapper/utils"
@@ -215,20 +216,22 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 		return
 	}
 
-	session, err := h.Store.OpenSession("")
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
-		return
-	}
 	attributesJSON := c.Query("attributes")
 	fmt.Println(attributesJSON)
 	var attributes map[string][]string
 	if attributesJSON != "" {
 		err := json.Unmarshal([]byte(attributesJSON), &attributes)
 		if err != nil {
+			fmt.Println(err.Error())
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid attributes format"})
 			return
 		}
+	}
+
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
 	}
 	defer session.Close()
 
@@ -243,9 +246,18 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	}
 
 	for key, values := range attributes {
-		for _, value := range values {
-			fmt.Println(key, value)
-			q = q.WhereEquals(fmt.Sprintf("attributes.%s", key), value)
+		if len(values) > 0 {
+			q = q.OpenSubclause()
+			for i, value := range values {
+				if i > 0 {
+					q = q.OrElse()
+				}
+				// Update to match the indexed fields format
+				// For example, using "Attributes_Color" for the "color" attribute
+				indexedFieldName := fmt.Sprintf("Attributes_%s", capitalizeFirstLetter(key))
+				q = q.WhereEquals(indexedFieldName, value)
+			}
+			q = q.CloseSubclause()
 		}
 	}
 	// size := c.Query("size")
@@ -439,4 +451,11 @@ func (h *ItemHandler) GetAttributes(c *gin.Context) {
 	attributes := models.Attributes{}
 	options := utils.ExtractOneOfOptions(attributes)
 	c.JSON(http.StatusOK, gin.H{"attributes": options})
+}
+
+func capitalizeFirstLetter(s string) string {
+	if len(s) == 0 {
+		return s
+	}
+	return strings.ToUpper(s[:1]) + s[1:]
 }
