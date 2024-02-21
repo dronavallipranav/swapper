@@ -7,13 +7,11 @@ import { Item } from "../../models/Item";
 import { User } from "../../models/User";
 import { getUser } from "../../services/AuthService";
 import ProfilePictureOrInitial from "../../components/ProfilePictureOrInitial";
-import RatingStars from "../../components/Ratings/StarRating";
 import RatingRow from "../../components/Ratings/RatingRow";
 import Ratings from "../../components/Ratings/Ratings";
 import { Rating } from "../../models/Rating";
 import {
   fetchItemRatings,
-  fetchRatingById,
 } from "../../services/RatingService";
 import Header from "../../components/Header";
 

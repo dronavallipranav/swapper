@@ -26,28 +26,32 @@ const HomePage = () => {
   };
 
   useEffect(() => {
-    setAttributes(prev => {
+    setAttributes((prev) => {
       if (selectedCategories.includes("All")) {
         return { ...prev, itemCategory: [] };
       }
       // Extract itemCategory from previous attributes
       const { itemCategory: prevItemCategory = [] } = prev;
-  
+
       // Combine previous itemCategory with selectedCategories, ensuring uniqueness
-      const combinedCategories = Array.isArray(selectedCategories) 
-        ? [...new Set([...prevItemCategory, ...selectedCategories])] 
+      const combinedCategories = Array.isArray(selectedCategories)
+        ? [...new Set([...prevItemCategory, ...selectedCategories])]
         : prevItemCategory;
-  
+
       // Return the updated attributes only if there's a change
-      if (combinedCategories.length !== prevItemCategory.length || 
-          !combinedCategories.every((val, index) => val === prevItemCategory[index])) {
+      if (
+        combinedCategories.length !== prevItemCategory.length ||
+        !combinedCategories.every(
+          (val, index) => val === prevItemCategory[index]
+        )
+      ) {
         return { ...prev, itemCategory: combinedCategories };
       }
-  
+
       // If there's no change, return previous attributes to avoid unnecessary re-renders
       return prev;
     });
-  }, [selectedCategories, setAttributes]);  
+  }, [selectedCategories, setAttributes]);
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     // check if its a child of the attributeSelectorRef,
