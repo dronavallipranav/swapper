@@ -1,6 +1,8 @@
 module swapper
 
-go 1.21.5
+go 1.22
+
+toolchain go1.22.0
 
 require (
 	github.com/gin-contrib/cors v1.5.0
@@ -9,6 +11,11 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.2.0
 	github.com/ravendb/ravendb-go-client v0.0.0-20240117082009-80731167bc4b
 	golang.org/x/crypto v0.19.0
+)
+
+require (
+	github.com/brianvoe/gofakeit v3.18.0+incompatible // indirect
+	github.com/brianvoe/gofakeit/v7 v7.0.1 // indirect
 )
 
 require (

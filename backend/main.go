@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"swapper/api"
+	"swapper/db/seeding"
 	"swapper/indexing"
 
 	"github.com/gin-contrib/cors"
@@ -42,6 +43,9 @@ func main() {
 		log.Fatalf("Failed to execute index: %v", err)
 		return
 	}
+
+	// Seed the database
+	seeding.Seed(documentStore)
 
 	setupRoutes(r, documentStore)
 
