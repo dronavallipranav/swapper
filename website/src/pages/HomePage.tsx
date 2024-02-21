@@ -10,7 +10,6 @@ import { filledStar } from "../components/Ratings/StarRating";
 
 const HomePage = () => {
   const [items, setItems] = useState<Item[] | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [search, setSearch] = useState("");
   const [location, setLocation] = useState<Location | undefined>(undefined);
   const [selectedRadius, setSelectedRadius] = useState<number>(10);
@@ -18,10 +17,37 @@ const HomePage = () => {
   const attributeSelectorRef = useRef(null);
   const [attributes, setAttributes] = useState<Record<string, string[]>>({});
   const nav = useNavigate();
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
 
   const updateAttributes = (newAttributes: Record<string, string[]>) => {
+    // update the selected categories
+    setSelectedCategories(newAttributes.itemCategories || []);
     setAttributes(newAttributes);
   };
+
+  useEffect(() => {
+    setAttributes(prev => {
+      if (selectedCategories.includes("All")) {
+        return { ...prev, itemCategory: [] };
+      }
+      // Extract itemCategory from previous attributes
+      const { itemCategory: prevItemCategory = [] } = prev;
+  
+      // Combine previous itemCategory with selectedCategories, ensuring uniqueness
+      const combinedCategories = Array.isArray(selectedCategories) 
+        ? [...new Set([...prevItemCategory, ...selectedCategories])] 
+        : prevItemCategory;
+  
+      // Return the updated attributes only if there's a change
+      if (combinedCategories.length !== prevItemCategory.length || 
+          !combinedCategories.every((val, index) => val === prevItemCategory[index])) {
+        return { ...prev, itemCategory: combinedCategories };
+      }
+  
+      // If there's no change, return previous attributes to avoid unnecessary re-renders
+      return prev;
+    });
+  }, [selectedCategories, setAttributes]);  
 
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     // check if its a child of the attributeSelectorRef,
@@ -43,7 +69,7 @@ const HomePage = () => {
         latitude: location?.latitude || 43.0731,
         longitude: location?.longitude || -89.4012,
         radius: selectedRadius,
-        categories: selectedCategory !== "All" ? [selectedCategory] : [],
+        categories: [],
         status: "available",
         limit: 500,
         skip: 0,
@@ -59,22 +85,12 @@ const HomePage = () => {
           console.error(error);
         });
     }, 300),
-    [search, selectedCategory, selectedRadius, location, attributes]
+    [search, selectedRadius, location, attributes]
   ); //dependencies for the debounced function
 
   useEffect(() => {
     fetchItemsDebounced({ search });
   }, [fetchItemsDebounced]); //call the debounced function when the search changes
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearch(e.target.value);
-  };
-
-  const handleCategoryChange = (
-    event: React.ChangeEvent<HTMLSelectElement>
-  ) => {
-    setSelectedCategory(event.target.value);
-  };
 
   return (
     <div className="pb-8">
@@ -87,8 +103,8 @@ const HomePage = () => {
         setSelectedRadius={setSelectedRadius}
         isFilterVisible={isFilterVisible}
         setIsFilterVisible={setIsFilterVisible}
-        selectedCategory={selectedCategory}
-        setSelectedCategory={setSelectedCategory}
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
       />
       <div className="container mx-auto px-4 py-10">
         <div
