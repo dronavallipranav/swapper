@@ -37,7 +37,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating, allowClick }) => {
     const { left, width } = star.getBoundingClientRect();
     const clickX = event.clientX;
     const isLeftHalf = clickX < left + width / 2;
-    let ratingValue = isLeftHalf ? starIndex + 0.5 : starIndex + 1;
+    const ratingValue = isLeftHalf ? starIndex + 0.5 : starIndex + 1;
     setRatingState(ratingValue);
     allowClick(ratingValue * 2);
   };

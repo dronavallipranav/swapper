@@ -52,8 +52,8 @@ const CitySearchComponent: React.FC<CitySearchComponentProps> = ({
     _: ActionMeta<CityOption>
   ) => {
     if (selectedOption) {
-      let lat = parseFloat(selectedOption.value.lat);
-      let lon = parseFloat(selectedOption.value.lon);
+      const lat = parseFloat(selectedOption.value.lat);
+      const lon = parseFloat(selectedOption.value.lon);
 
       if (storeLocation) {
         LocationService.overrideLocation(lat, lon);

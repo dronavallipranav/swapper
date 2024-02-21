@@ -94,7 +94,7 @@ const ConversationsPage: React.FC = () => {
                 ? message.recipientID
                 : message.senderID;
             const otherUser = participants[otherUserId];
-            let url = `/messages/${encodeURIComponent(otherUserId)}`;
+            const url = `/messages/${encodeURIComponent(otherUserId)}`;
 
             return (
               <li
