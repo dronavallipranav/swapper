@@ -80,7 +80,7 @@ const AttributeSelector: React.FC<{ onAttributesChange: Function }> = ({
     // i want format to be {attribute: [option1, option2], attribute2: [option1, option2]}
     const selectedOptionsArray = Object.entries(selectedOptions).map(
       ([attribute, options]) => {
-        let d: Record<string, any[]> = {};
+        const d: Record<string, any[]> = {};
         d[attribute] = options.map((option: any) => option.value);
         return d;
       }
@@ -90,11 +90,11 @@ const AttributeSelector: React.FC<{ onAttributesChange: Function }> = ({
       return;
     }
 
-    let newData: Record<string, any[]> = {};
+    const newData: Record<string, any[]> = {};
 
     for (let i = 0; i < selectedOptionsArray.length; i++) {
-      let key = Object.keys(selectedOptionsArray[i])[0];
-      let value = selectedOptionsArray[i][key];
+      const key = Object.keys(selectedOptionsArray[i])[0];
+      const value = selectedOptionsArray[i][key];
 
       if (value.length === 0) {
         continue;

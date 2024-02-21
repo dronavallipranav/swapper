@@ -18,7 +18,7 @@ import {
 import Header from "../../components/Header";
 
 const ItemPage = () => {
-  let { itemID } = useParams();
+  const { itemID } = useParams();
   const [item, setItem] = useState<Item | null>(null);
   const [avgRating, setAvgRating] = useState<number>(0);
   const [numRatings, setNumRatings] = useState<number>(0);
