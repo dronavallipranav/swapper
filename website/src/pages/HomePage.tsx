@@ -130,7 +130,7 @@ const HomePage = () => {
             items.map((item) => (
               <div
                 key={item.id}
-                className="card card-compact w-full md:w-75 bg-base-100 shadow-xl hover:scale-110 cursor-pointer transform transition-transform"
+                className="card card-compact w-full md:w-75 bg-base-100 shadow-xl hover:scale-105 cursor-pointer transform transition-transform"
                 onClick={() => {
                   nav(`/${item.id}`);
                 }}
