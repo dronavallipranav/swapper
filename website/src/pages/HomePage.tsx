@@ -77,7 +77,7 @@ const HomePage = () => {
   };
 
   return (
-    <div>
+    <div className="pb-8">
       <HomeHeader
         search={search}
         setSearch={setSearch}
