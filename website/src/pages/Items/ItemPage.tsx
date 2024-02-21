@@ -84,7 +84,7 @@ const ItemPage = () => {
   }
 
   return (
-    <div>
+    <div className="pb-16">
       <Header />
       <div className="container mx-auto mt-4 mb-4">
         {error && <div className="alert alert-error">{error}</div>}

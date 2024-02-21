@@ -4,7 +4,7 @@ function AboutPage() {
   return (
     <div>
     <Header/>
-    <div className="container mx-auto px-4 py-10">
+    <div className="container mx-auto px-4 py-10 min-h-screen">
       <h1 className="text-4xl font-bold text-center mb-4">About Us</h1>
       <p className="max-w-2xl mx-auto text-center mb-6">
         Hi! My name is <a href="https://dronavalli.dev" className="text-blue-500 hover:text-blue-700">Pranav Dronavalli</a> and my partner is <a href="https://dteather.com" className="text-blue-500 hover:text-blue-700">David Teather</a>. We are two software developers from Madison, Wisconsin where we currently attend college.
