@@ -210,7 +210,7 @@ const ItemPage = () => {
 
                 {isItemOwner && (
                   <>
-                    <button className="btn btn-secondary mr-2">Edit</button>
+                    {/*<button className="btn btn-secondary mr-2">Edit</button>*/}
                     <button
                       onClick={() => {
                         deleteItem(item?.id || "")
