@@ -29,6 +29,7 @@ const AddRating: React.FC<AddRatingProps> = ({
     body: "",
     stars: 0,
   });
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -55,8 +56,11 @@ const AddRating: React.FC<AddRatingProps> = ({
     }
 
     try {
-      await createRating(ratingData);
-      onSuccess();
+      createRating(ratingData).then(() => {
+        onSuccess();
+      }).catch((e) => {
+        setError(e.response.data.error);
+      })
     } catch (error) {
       console.error("Error creating rating:", error);
     }
@@ -83,6 +87,7 @@ const AddRating: React.FC<AddRatingProps> = ({
           <div className="space-y-2">
             <StarRating rating={ratingData.stars} allowClick={updateStars} />
           </div>
+          {error && <div className="text-red-500">{error}</div>}
           <div className="space-y-2">
             <label htmlFor="title" className="block font-semibold">
               Review Title
