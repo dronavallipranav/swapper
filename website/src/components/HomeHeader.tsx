@@ -202,7 +202,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
         ></div>
       )}
       {/* Adjusted Combined Search Field for Mobile Optimization */}
-      <div className="md:hidden flex flex-col items-center gap-2 w-full px-4">
+      <div className="md:hidden flex flex-col items-center gap-2 w-full px-4 pt-6">
         <input
           type="text"
           value={search}
@@ -248,7 +248,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search for items..."
-            className="flex-grow bg-transparent lg:pl-4 focus:outline-none rounded-l-full"
+            className="flex-grow bg-transparent pl-4 focus:outline-none rounded-l-full"
           />
 
           <div className="flex items-center w-full md:w-auto px-4 py-2">
