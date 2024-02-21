@@ -37,7 +37,11 @@ func main() {
 	defer documentStore.Close()
 
 	//setup spatial indexing
-	documentStore.ExecuteIndex(indexing.NewItemsWithSpatialAndFullTextSearchIndex(), "swapper")
+	err = documentStore.ExecuteIndex(indexing.NewItemsWithSpatialAndFullTextSearchIndex(), "swapper")
+	if err != nil {
+		log.Fatalf("Failed to execute index: %v", err)
+		return
+	}
 
 	setupRoutes(r, documentStore)
 
