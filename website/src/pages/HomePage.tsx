@@ -136,8 +136,12 @@ const HomePage = () => {
                 }}
               >
                 {item.attachments && item.attachments[0] && (
-                  <figure>
-                    <img src={item.attachments[0]} alt="Item" />
+                  <figure className="overflow-hidden">
+                    <img
+                      src={item.attachments[0]}
+                      alt="Item"
+                      className="w-full h-48 md:h-72 object-cover"
+                    />
                   </figure>
                 )}
 
@@ -148,13 +152,14 @@ const HomePage = () => {
                     </h2>
 
                     <div className="flex items-center">
-                    <span className="w-3 h-3 inline-block mr-1">{filledStar}</span>{" "}
+                      <span className="w-3 h-3 inline-block mr-1">
+                        {filledStar}
+                      </span>{" "}
                       <span>
                         {item.avgRating
                           ? (item.avgRating / 2).toFixed(1)
                           : "0.0"}
                       </span>
-                      
                     </div>
                   </div>
 
