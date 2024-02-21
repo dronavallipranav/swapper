@@ -2,6 +2,7 @@ package api
 
 import (
 	"net/http"
+	"swapper/middleware"
 	"swapper/models"
 	"time"
 
@@ -20,10 +21,10 @@ func NewRatingHandler(store *ravendb.DocumentStore) *RatingHandler {
 
 // RegisterRatingRoutes sets up the routes for rating operations.
 func (h *RatingHandler) RegisterRatingRoutes(r *gin.Engine) {
-	r.POST("/ratings", h.CreateRating)
+	r.POST("/ratings", middleware.AuthMiddleware(), h.CreateRating)
 	r.GET("/ratings/:id", h.GetRating)
-	r.PUT("/ratings/:id", h.UpdateRating)
-	r.DELETE("/ratings/:id", h.DeleteRating)
+	r.PUT("/ratings/:id", middleware.AuthMiddleware(), h.UpdateRating)
+	r.DELETE("/ratings/:id", middleware.AuthMiddleware(), h.DeleteRating)
 }
 
 type CreateRatingRequest struct {
@@ -156,7 +157,7 @@ func (h *RatingHandler) UpdateRating(c *gin.Context) {
 
 // DeleteRating handles the deletion of a rating.
 func (h *RatingHandler) DeleteRating(c *gin.Context) {
-	id := c.Param("id")
+	id := "ratings/" + c.Param("id")
 	userID, exists := c.Get("userID")
 	if !exists {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
@@ -170,13 +171,13 @@ func (h *RatingHandler) DeleteRating(c *gin.Context) {
 	}
 	defer session.Close()
 
-	var rating models.Rating
+	var rating *models.Rating
 	if err := session.Load(&rating, id); err != nil || rating.CreatorID != userID {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized or rating not found"})
 		return
 	}
 
-	if err := session.Delete(&rating); err != nil {
+	if err := session.Delete(rating); err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Rating not found or failed to delete"})
 		return
 	}

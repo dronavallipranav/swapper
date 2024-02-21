@@ -1,39 +1,67 @@
-import { fill } from "lodash";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 interface RatingStarsProps {
   rating: number;
+  allowClick?: (rating: number) => void;
 }
 
-const RatingStars: React.FC<RatingStarsProps> = ({ rating }) => {
+const RatingStars: React.FC<RatingStarsProps> = ({ rating, allowClick }) => {
+  const [starMap, setStarMap] = useState<(0 | 0.5 | 1)[]>([0, 0, 0, 0, 0]);
+  const [ratingState, setRatingState] = useState<number>(rating / 2);
   const totalStars = 5;
-  const fullStar = Math.floor(rating / 2);
-  const halfStar = rating % 2 >= 1 ? 1 : 0;
-  const emptyStar = totalStars - fullStar - halfStar;
 
-    const classes = "w-6 h-6 text-yellow-500 inline-block items-center";
+  useEffect(() => {
+    const fullStars = Math.floor(ratingState);
+    const halfStar = ratingState % 1 >= 0.5 ? 0.5 : 0;
+
+    let newStarMap = new Array(totalStars).fill(0);
+    newStarMap = newStarMap.map((_, index) => {
+      if (index < fullStars) return 1;
+      if (index === fullStars) return halfStar;
+      return 0;
+    });
+
+    setStarMap(
+      newStarMap
+    );
+  }, [ratingState]);
+
+  const handleStarClick = (
+    event: React.MouseEvent<HTMLElement>,
+    starIndex: number
+  ) => {
+    if (!allowClick) return;
+
+
+    const star = event.currentTarget;
+    const { left, width } = star.getBoundingClientRect();
+    const clickX = event.clientX;
+    const isLeftHalf = clickX < left + width / 2;
+    let ratingValue = isLeftHalf ? starIndex + 0.5 : starIndex + 1;
+    setRatingState(ratingValue);
+    allowClick(ratingValue * 2);
+  };
 
   return (
     <div className="flex gap-1">
-      {[...Array(fullStar)].map((_, i) => (
-        <span className={classes} key={i}>
-        {filledStar}
-        </span>
-      ))}
-      {halfStar === 1 && (
-        <span className={classes} >
-        {halfStarIcon}
-        </span>
-      )}
-      {[...Array(emptyStar)].map((_, i) => (
-        <span className={classes} key={i}>
-        {unFilledStar}
-        </span>
-      ))}
+      {starMap.map((star, index) => {
+        return (
+          <span
+            className={`w-6 h-6 text-yellow-500 inline-block items-center ${allowClick ? "cursor-pointer" : ""}`}
+            key={`star-${index}`}
+            onClick={(e) => handleStarClick(e, index)}
+          >
+            {star === 0
+              ? unFilledStar
+              : star === 0.5
+              ? halfStarIcon
+              : filledStar}
+          </span>
+        );
+      })}
     </div>
   );
 };
-
 const unFilledStar = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
