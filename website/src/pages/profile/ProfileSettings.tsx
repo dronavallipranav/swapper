@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../contexts/AuthContext'; // Assuming this is where user info and update functions are stored
-import { updateUser } from '../../services/AuthService';
-import { useNavigate } from 'react-router-dom';
-import Header from '../../components/Header';
+import React, { useState, useEffect } from "react";
+import { useAuth } from "../../contexts/AuthContext"; // Assuming this is where user info and update functions are stored
+import { updateUser } from "../../services/AuthService";
+import { useNavigate } from "react-router-dom";
+import Header from "../../components/Header";
 const ProfileSettings = () => {
   const { user, loginUser } = useAuth(); // Assuming updateUser is a method to update user details
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [profileImage, setProfileImage] = useState<string | File>();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const nav = useNavigate();
 
@@ -16,7 +16,7 @@ const ProfileSettings = () => {
     if (user) {
       setName(user.name);
       setEmail(user.email);
-      setProfileImage(user.profilePicture); 
+      setProfileImage(user.profilePicture);
     }
   }, [user]);
 
@@ -62,56 +62,62 @@ const ProfileSettings = () => {
   return (
     <div>
       <Header />
-    <div className="container mx-auto px-4 py-10">
-      <h1 className="text-2xl font-semibold mb-4">Profile Settings</h1>
-      {error && <div className="alert alert-error">{error}</div>}
-      {success && <div className="alert alert-success">Profile updated successfully</div>}
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="form-control">
-          <label className="label" htmlFor="name">
-            <span className="label-text">Name</span>
-          </label>
-          <input
-            id="name"
-            type="text"
-            placeholder="Name"
-            className="input input-bordered"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label className="label" htmlFor="email">
-            <span className="label-text">Email</span>
-          </label>
-          <input
-            id="email"
-            type="email"
-            placeholder="Email"
-            className="input input-bordered"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div className="form-control">
-          <label className="label" htmlFor="profileImage">
-            <span className="label-text">Profile Image</span>
-          </label>
-          <input
-            id="profileImage"
-            type="file"
-            className="input input-bordered"
-            onChange={handleImageChange}
-            accept="image/png, image/jpeg, image/jpg"
-          />
-        </div>
-        <div className="form-control mt-6">
-          <button type="submit" className="btn btn-primary">Update Profile</button>
-        </div>
-      </form>
-    </div>
+      <div className="container mx-auto px-4 py-10">
+        <h1 className="text-2xl font-semibold mb-4">Profile Settings</h1>
+        {error && <div className="alert alert-error">{error}</div>}
+        {success && (
+          <div className="alert alert-success">
+            Profile updated successfully
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="form-control">
+            <label className="label" htmlFor="name">
+              <span className="label-text">Name</span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              placeholder="Name"
+              className="input input-bordered"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label" htmlFor="email">
+              <span className="label-text">Email</span>
+            </label>
+            <input
+              id="email"
+              type="email"
+              placeholder="Email"
+              className="input input-bordered"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-control">
+            <label className="label" htmlFor="profileImage">
+              <span className="label-text">Profile Image</span>
+            </label>
+            <input
+              id="profileImage"
+              type="file"
+              className="input input-bordered"
+              onChange={handleImageChange}
+              accept="image/png, image/jpeg, image/jpg"
+            />
+          </div>
+          <div className="form-control mt-6">
+            <button type="submit" className="btn btn-primary">
+              Update Profile
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

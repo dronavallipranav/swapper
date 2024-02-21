@@ -85,47 +85,47 @@ const ConversationsPage: React.FC = () => {
   return (
     <div>
       <Header />
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Your Conversations</h1>
-      <ul>
-        {conversations.map((message, index) => {
-          const otherUserId =
-            message.senderID === user?.id
-              ? message.recipientID
-              : message.senderID;
-          const otherUser = participants[otherUserId];
-          let url = `/messages/${encodeURIComponent(otherUserId)}`;
+      <div className="p-4">
+        <h1 className="text-2xl font-bold mb-4">Your Conversations</h1>
+        <ul>
+          {conversations.map((message, index) => {
+            const otherUserId =
+              message.senderID === user?.id
+                ? message.recipientID
+                : message.senderID;
+            const otherUser = participants[otherUserId];
+            let url = `/messages/${encodeURIComponent(otherUserId)}`;
 
-          return (
-            <li
-              key={index}
-              className="mb-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
-              onClick={() => navigate(url)}
-            >
-              <div className="flex items-center gap-2">
-                <ProfilePictureOrInitial user={otherUser} />
-                <div className="flex flex-col flex-grow">
-                  <div className="flex justify-between items-center">
-                    <span className="font-bold">
-                      {otherUser?.name || "Unknown"}
-                    </span>
-                    <span className="text-xs text-gray-500">
-                      {new Date(message.sentAt).toLocaleTimeString()}
-                    </span>
-                  </div>
+            return (
+              <li
+                key={index}
+                className="mb-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+                onClick={() => navigate(url)}
+              >
+                <div className="flex items-center gap-2">
+                  <ProfilePictureOrInitial user={otherUser} />
+                  <div className="flex flex-col flex-grow">
+                    <div className="flex justify-between items-center">
+                      <span className="font-bold">
+                        {otherUser?.name || "Unknown"}
+                      </span>
+                      <span className="text-xs text-gray-500">
+                        {new Date(message.sentAt).toLocaleTimeString()}
+                      </span>
+                    </div>
 
-                  <div className="text-sm text-gray-600 overflow-ellipsis overflow-hidden whitespace-nowrap">
-                    {message.senderID === user?.id
-                      ? `You: ${message.text}`
-                      : message.text}
+                    <div className="text-sm text-gray-600 overflow-ellipsis overflow-hidden whitespace-nowrap">
+                      {message.senderID === user?.id
+                        ? `You: ${message.text}`
+                        : message.text}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </li>
-          );
-        })}
-      </ul>
-    </div>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
     </div>
   );
 };
