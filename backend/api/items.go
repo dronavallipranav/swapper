@@ -328,7 +328,7 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	for _, item := range items {
 		var ratings []*models.Rating
 		ratingsQuery := session.QueryCollection("Ratings") // Adjust if you have a specific collection name for ratings
-		ratingsQuery = ratingsQuery.WhereEquals("RecipientID", item.ID).AndAlso().WhereEquals("RecipientIsItem", true)
+		ratingsQuery = ratingsQuery.WhereEquals("recipientID", item.ID).AndAlso().WhereEquals("RecipientIsItem", true)
 		err = ratingsQuery.GetResults(&ratings)
 		if err != nil {
 			fmt.Println(err.Error())
@@ -379,7 +379,7 @@ func (h *ItemHandler) GetItem(c *gin.Context) {
 
 	var ratings []*models.Rating
 	ratingsQuery := session.QueryCollection("Ratings") // Adjust if you have a specific collection name for ratings
-	ratingsQuery = ratingsQuery.WhereEquals("RecipientID", id).AndAlso().WhereEquals("RecipientIsItem", true)
+	ratingsQuery = ratingsQuery.WhereEquals("recipientID", id).AndAlso().WhereEquals("recipientIsItem", true)
 	err = ratingsQuery.GetResults(&ratings)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -519,7 +519,7 @@ func (h *ItemHandler) GetItemRatings(c *gin.Context) {
 
 	var ratings []*models.Rating
 	// Assuming "Ratings" is your collection name and "RecipientID" refers to the item being rated
-	ratingsQuery := session.QueryCollection("Ratings").WhereEquals("RecipientID", itemID).AndAlso().WhereEquals("RecipientIsItem", true)
+	ratingsQuery := session.QueryCollection("Ratings").WhereEquals("recipientID", itemID).AndAlso().WhereEquals("recipientIsItem", true)
 	err = ratingsQuery.GetResults(&ratings)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -527,5 +527,5 @@ func (h *ItemHandler) GetItemRatings(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"ratings": ratings}) // Directly return the ratings
+	c.JSON(http.StatusOK, gin.H{"ratings": ratings})
 }

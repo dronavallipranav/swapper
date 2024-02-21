@@ -20,7 +20,8 @@ export const updateRating = async (ratingId: string, updateData: Partial<Rating>
 };
 
 export const deleteRating = async (ratingId: string): Promise<AxiosResponse> => {
-  return api.delete(`/ratings/${ratingId}`);
+  console.log("ratingId", ratingId)
+  return api.delete(`${ratingId}`);
 };
 
 export const fetchUserRatings = async (userId: string): Promise<Rating[]> => {

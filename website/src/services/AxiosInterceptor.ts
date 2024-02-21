@@ -34,7 +34,7 @@ api.interceptors.response.use(
     if (error.response && error.response.status == 401) {
       if (window.location.pathname !== '/login' && window.location.pathname !== '/signup') {
         // Redirect to logout if not already on login page
-        window.location.href = '/logout';
+        //window.location.href = '/logout';
       }
     }
     return Promise.reject(error);

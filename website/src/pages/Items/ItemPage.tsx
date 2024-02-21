@@ -7,12 +7,18 @@ import { Item } from "../../models/Item";
 import { User } from "../../models/User";
 import { getUser } from "../../services/AuthService";
 import ProfilePictureOrInitial from "../../components/ProfilePictureOrInitial";
-import RatingStars from "../../components/StarRating";
-import RatingRow from "../../components/RatingRow";
+import RatingStars from "../../components/Ratings/StarRating";
+import RatingRow from "../../components/Ratings/RatingRow";
+import Ratings from "../../components/Ratings/Ratings";
+import { Rating } from "../../models/Rating";
+import { fetchItemRatings, fetchRatingById } from "../../services/RatingService";
 
 const ItemPage = () => {
   let { itemID } = useParams();
   const [item, setItem] = useState<Item | null>(null);
+  const [avgRating, setAvgRating] = useState<number>(0);
+  const [numRatings, setNumRatings] = useState<number>(0);
+  const [ratings, setRatings] = useState<Rating[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -39,9 +45,16 @@ const ItemPage = () => {
             .catch((error) => setError("Failed to fetch owner details."));
         }
 
+        if (fetchedItem.avgRating) setAvgRating(fetchedItem.avgRating);
+        if (fetchedItem.numRatings) setNumRatings(fetchedItem.numRatings);
+
         setMessage(`Hi, I'm interested in your ${fetchedItem.title}`);
       })
       .catch((error) => setError("Failed to fetch item details."));
+
+    fetchItemRatings("items/" + itemID).then((fetchedRatings: Rating[]) => {
+      setRatings(fetchedRatings);
+    }).catch((error) => setError("Failed to fetch item ratings."));
   }, [itemID, user]);
 
   const handleSendMessage = async () => {
@@ -113,7 +126,7 @@ const ItemPage = () => {
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {item?.title}
               </h2>
-              <RatingRow avgRating={item?.avgRating || 0} numRatings={item?.numRatings || 0} className="mb-2" />
+              <RatingRow key={avgRating} avgRating={avgRating} numRatings={numRatings} className="mb-2" />
               {item?.createdAt && (
                 <p className="text-sm text-gray-500 mb-4">
                   Posted on {new Date(item.createdAt).toLocaleDateString()} at{" "}
@@ -237,6 +250,11 @@ const ItemPage = () => {
           </div>
         </div>
       )}
+
+      {/* Ratings */}
+      <div className="mt-8">
+      <Ratings ratings={ratings || []} recipientID={item?.id} recipientIsItem={true} />
+      </div>
     </div>
   );
 };
