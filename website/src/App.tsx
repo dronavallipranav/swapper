@@ -12,7 +12,6 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { NewItemPage } from "./pages/Items/NewItemPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
-
   return (
     <>
       <div className="min-h-screen">
@@ -20,7 +19,7 @@ function App() {
           <BrowserRouter>
             <Routes>
               {/* Main Pages */}
-              <Route path="/" element={<HomePage/>} />
+              <Route path="/" element={<HomePage />} />
               <Route path="/about" element={<AboutPage />} />
 
               {/* Item Routes */}

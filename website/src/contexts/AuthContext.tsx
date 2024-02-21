@@ -1,6 +1,12 @@
-import React, { createContext, useContext, ReactNode, useState, useEffect } from 'react';
-import { getUser, isAuth, logout } from '../services/AuthService';
-import { User } from '../models/User';
+import React, {
+  createContext,
+  useContext,
+  ReactNode,
+  useState,
+  useEffect,
+} from "react";
+import { getUser, isAuth, logout } from "../services/AuthService";
+import { User } from "../models/User";
 
 type AuthContextType = {
   user: User | null;
@@ -20,7 +26,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(isAuth());
 
   useEffect(() => {
-    const storedUser = localStorage.getItem('user');
+    const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
@@ -29,9 +35,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const loginUser = (user: User) => {
     setUser(user);
     getUser(user.id).then((u) => {
-      localStorage.setItem('user', JSON.stringify(u));
+      localStorage.setItem("user", JSON.stringify(u));
       setUser(u); // this is to retrieve additional information like user pfp
-    })
+    });
     setIsAuthenticated(true);
   };
 
@@ -42,7 +48,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, logoutUser, loginUser }}>
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, logoutUser, loginUser }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -51,7 +59,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

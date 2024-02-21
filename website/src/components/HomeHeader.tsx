@@ -20,7 +20,7 @@ const categoryIcons: Record<string, string> = {
   "Home And Garden": HomeGardenIcon,
   Sports: SportsIcon,
   Toys: ToysIcon,
-  Automotive: CarIcon
+  Automotive: CarIcon,
 };
 
 interface HeaderProps {
@@ -289,7 +289,8 @@ const HomeHeader: React.FC<HeaderProps> = ({
         {categories &&
           categories.map(
             (category, index) =>
-              (categoryIcons[toTitleCaseWithSpaces(category)] || category == "All") && (
+              (categoryIcons[toTitleCaseWithSpaces(category)] ||
+                category == "All") && (
                 <button
                   key={index}
                   className={`btn ${

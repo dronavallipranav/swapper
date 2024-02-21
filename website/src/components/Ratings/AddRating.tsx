@@ -56,11 +56,13 @@ const AddRating: React.FC<AddRatingProps> = ({
     }
 
     try {
-      createRating(ratingData).then(() => {
-        onSuccess();
-      }).catch((e) => {
-        setError(e.response.data.error);
-      })
+      createRating(ratingData)
+        .then(() => {
+          onSuccess();
+        })
+        .catch((e) => {
+          setError(e.response.data.error);
+        });
     } catch (error) {
       console.error("Error creating rating:", error);
     }

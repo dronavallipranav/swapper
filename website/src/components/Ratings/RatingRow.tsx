@@ -7,14 +7,18 @@ interface RatingRowProps {
   className?: string;
 }
 
-const RatingRow: React.FC<RatingRowProps> = ({ avgRating, numRatings, className }) => {
-const [avgRatingState, setAvgRating] = useState<number>(avgRating);
-const [numRatingsState, setNumRatings] = useState<number>(numRatings);
+const RatingRow: React.FC<RatingRowProps> = ({
+  avgRating,
+  numRatings,
+  className,
+}) => {
+  const [avgRatingState, setAvgRating] = useState<number>(avgRating);
+  const [numRatingsState, setNumRatings] = useState<number>(numRatings);
 
   useEffect(() => {
     setAvgRating(avgRating);
     setNumRatings(numRatings);
-  }, [avgRating, numRatings, className])
+  }, [avgRating, numRatings, className]);
 
   return (
     <div className={`flex items-center ${className}`}>

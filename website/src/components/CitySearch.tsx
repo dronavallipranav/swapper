@@ -82,14 +82,14 @@ const CitySearchComponent: React.FC<CitySearchComponentProps> = ({
         styles={{
           control: (provided) => ({
             ...provided,
-            width: '100%',
-            maxWidth: '200px',
+            width: "100%",
+            maxWidth: "200px",
           }),
           valueContainer: (provided) => ({
             ...provided,
-            overflow: 'hidden',
-            whiteSpace: 'nowrap',
-            textOverflow: 'ellipsis',
+            overflow: "hidden",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
           }),
         }}
       />

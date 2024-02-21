@@ -21,9 +21,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating, allowClick }) => {
       return 0;
     });
 
-    setStarMap(
-      newStarMap
-    );
+    setStarMap(newStarMap);
   }, [ratingState]);
 
   const handleStarClick = (
@@ -31,7 +29,6 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating, allowClick }) => {
     starIndex: number
   ) => {
     if (!allowClick) return;
-
 
     const star = event.currentTarget;
     const { left, width } = star.getBoundingClientRect();
@@ -47,7 +44,9 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating, allowClick }) => {
       {starMap.map((star, index) => {
         return (
           <span
-            className={`w-6 h-6 text-yellow-500 inline-block items-center ${allowClick ? "cursor-pointer" : ""}`}
+            className={`w-6 h-6 text-yellow-500 inline-block items-center ${
+              allowClick ? "cursor-pointer" : ""
+            }`}
             key={`star-${index}`}
             onClick={(e) => handleStarClick(e, index)}
           >
