@@ -328,7 +328,7 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 	for _, item := range items {
 		var ratings []*models.Rating
 		ratingsQuery := session.QueryCollection("Ratings") // Adjust if you have a specific collection name for ratings
-		ratingsQuery = ratingsQuery.WhereEquals("recipientID", item.ID).AndAlso().WhereEquals("RecipientIsItem", true)
+		ratingsQuery = ratingsQuery.WhereEquals("recipientID", item.ID).AndAlso().WhereEquals("recipientIsItem", true)
 		err = ratingsQuery.GetResults(&ratings)
 		if err != nil {
 			fmt.Println(err.Error())

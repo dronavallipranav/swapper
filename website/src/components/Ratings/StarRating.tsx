@@ -62,7 +62,7 @@ const RatingStars: React.FC<RatingStarsProps> = ({ rating, allowClick }) => {
     </div>
   );
 };
-const unFilledStar = (
+export const unFilledStar = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="currentColor"
@@ -72,7 +72,7 @@ const unFilledStar = (
   </svg>
 );
 
-const filledStar = (
+export const filledStar = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="currentColor"
@@ -82,7 +82,7 @@ const filledStar = (
   </svg>
 );
 
-const halfStarIcon = (
+export const halfStarIcon = (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     fill="currentColor"
