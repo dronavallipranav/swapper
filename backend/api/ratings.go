@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 	"swapper/middleware"
 	"swapper/models"
@@ -65,6 +66,22 @@ func (h *RatingHandler) CreateRating(c *gin.Context) {
 		return
 	}
 	defer session.Close()
+
+	var ratings []*models.Rating
+	ratingsQuery := session.QueryCollection("Ratings")
+	ratingsQuery = ratingsQuery.WhereEquals("recipientID", req.RecipientID)
+	ratingsQuery = ratingsQuery.WhereEquals("creatorID", userID)
+	err = ratingsQuery.GetResults(&ratings)
+	if err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings for item"})
+		return
+	}
+
+	if len(ratings) > 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "You have already rated this item"})
+		return
+	}
 
 	if err := session.Store(&rating); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to store rating"})
