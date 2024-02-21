@@ -82,7 +82,6 @@ func (h *ItemHandler) AddItem(c *gin.Context) {
 		Title:       addItemReq.Title,
 		Description: addItemReq.Description,
 		Quantity:    quantity,
-		Categories:  addItemReq.Categories,
 		Location:    addItemReq.Location,
 		Status:      "available",
 		Attributes:  addItemReq.Attributes,
@@ -181,7 +180,6 @@ url params:
 - lat (float): latitude
 - long (float): longitude
 - radius (float): radius in miles
-- categories (string[]): category to filter by
 - status (string): status to filter by
 - limit (int): limit the number of items returned (default 10)
 - skip (int): skip the first n items (default 0)
