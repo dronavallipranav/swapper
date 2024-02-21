@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import AboutPage from "./pages/AboutPage";
@@ -6,24 +7,23 @@ import ItemPage from "./pages/Items/ItemPage";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
 import ProfileSettings from "./pages/profile/ProfileSettings";
-
 import MessagePanel from "./components/MessagePanel";
-import MessagePage from "./pages/MessagePage";
+import ConversationsPage from "./pages/ConversationsPage";
 import LogoutPage from "./pages/LogoutPage";
 import Header from "./components/Header";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NewItemPage } from "./pages/Items/NewItemPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
+
   return (
     <>
       <div className="min-h-screen">
         <AuthProvider>
           <BrowserRouter>
-            <Header />
             <Routes>
               {/* Main Pages */}
-              <Route path="/" element={<HomePage />} />
+              <Route path="/" element={<HomePage/>} />
               <Route path="/about" element={<AboutPage />} />
 
               {/* Item Routes */}
@@ -42,7 +42,7 @@ function App() {
                 path="/messages"
                 element={
                   <ProtectedRoute>
-                    <MessagePage />
+                    <ConversationsPage />
                   </ProtectedRoute>
                 }
               />
@@ -73,7 +73,6 @@ function App() {
           </BrowserRouter>
         </AuthProvider>
       </div>
-      <Footer />
     </>
   );
 }

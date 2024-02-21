@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext'; // Assuming this is where user info and update functions are stored
 import { updateUser } from '../../services/AuthService';
 import { useNavigate } from 'react-router-dom';
-
+import Header from '../../components/Header';
 const ProfileSettings = () => {
   const { user, loginUser } = useAuth(); // Assuming updateUser is a method to update user details
   const [name, setName] = useState('');
@@ -60,6 +60,8 @@ const ProfileSettings = () => {
   };
 
   return (
+    <div>
+      <Header />
     <div className="container mx-auto px-4 py-10">
       <h1 className="text-2xl font-semibold mb-4">Profile Settings</h1>
       {error && <div className="alert alert-error">{error}</div>}
@@ -109,6 +111,7 @@ const ProfileSettings = () => {
           <button type="submit" className="btn btn-primary">Update Profile</button>
         </div>
       </form>
+    </div>
     </div>
   );
 };

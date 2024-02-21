@@ -1,29 +1,19 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Item, Attributes} from "../models/Item";
 import { fetchAllItems } from "../services/ItemService";
-import CitySearchComponent from "../components/CitySearch";
 import { Location } from "../services/LocationService";
 import AttributeSelector from "../components/AttributeSelect";
 import { useNavigate } from "react-router-dom";
 import { debounce } from 'lodash';
+import HomeHeader from "../components/HomeHeader";
 
-const categories = [
-  "Electronics",
-  "Clothing",
-  "Toys",
-  "Home and Garden",
-  "Sports",
-  "Books",
-  "Other",
-];
-
-function HomePage() {
+const HomePage = () => {
   const [items, setItems] = useState<Item[] | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [search, setSearch] = useState('');
+  const [location, setLocation] = useState<Location | undefined>(undefined);
   const [selectedRadius, setSelectedRadius] = useState<number>(10);
-  const [location, setLocation] = useState<Location>();
-  const [search, setSearch] = useState<string>("");
-  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState<boolean>(false);
   const attributeSelectorRef = useRef(null);
   const [attributes, setAttributes] = useState<Record<string, string[]>>({});
   const nav = useNavigate();
@@ -85,52 +75,21 @@ function HomePage() {
   };
 
   return (
+    <div>
+    <HomeHeader 
+                    search ={search} 
+                    setSearch={setSearch}
+                    location={location}
+                    setLocation={setLocation}
+                    selectedRadius={selectedRadius}
+                    setSelectedRadius={setSelectedRadius}
+                    isFilterVisible={isFilterVisible}
+                    setIsFilterVisible={setIsFilterVisible}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                    />
     <div className="container mx-auto px-4 py-10">
-      <h1 className="text-4xl font-bold text-center mb-6">
-        Swapper
-      </h1>
-      <div className="flex flex-col md:flex-row justify-center items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search for items..."
-          className="input input-bordered input-lg w-full max-w-lg mx-auto"
-          onChange = {handleSearchChange}
-        />
-      </div>
-
-      <div className="flex flex-col md:flex-row justify-center mb-10 items-center gap-4 mt-4">
-        <div className="flex items-center">
-          <label className="label text-sm md:text-base">
-            <span className="label-text">In Region:</span>
-          </label>
-          <CitySearchComponent
-            messageText=""
-            storeLocation={true}
-            onChange={(l: Location): void => setLocation(l)}
-          />
-        </div>
-
-        <div className="flex items-center gap-2">
-          <label className="label text-sm md:text-base">
-            <span className="label-text">Search Radius (miles):</span>
-          </label>
-          <input
-            type="number"
-            value={selectedRadius}
-            onChange={(e) => setSelectedRadius(Number(e.target.value))}
-            className="input input-bordered w-full w-24"
-            min="1"
-          />
-        </div>
-
-        <button
-          className="btn btn-primary"
-          onClick={() => setIsFilterVisible(!isFilterVisible)}
-        >
-          All Filters
-        </button>
-      </div>
-
+ 
       <div
         className={`fixed inset-0 z-40 transform ${
           isFilterVisible ? "translate-x-0" : "-translate-x-full"
@@ -213,6 +172,7 @@ function HomePage() {
             </div>
           ))}
       </div>
+    </div>
     </div>
   );
 }

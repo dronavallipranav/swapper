@@ -1,5 +1,9 @@
+import Footer  from '../components/Footer';
+import Header from '../components/Header';
 function AboutPage() {
   return (
+    <div>
+    <Header/>
     <div className="container mx-auto px-4 py-10">
       <h1 className="text-4xl font-bold text-center mb-4">About Us</h1>
       <p className="max-w-2xl mx-auto text-center mb-6">
@@ -29,6 +33,8 @@ function AboutPage() {
           a difference, one item at a time.
         </p>
       </div>
+    </div>
+    <Footer/>
     </div>
   );
 }
