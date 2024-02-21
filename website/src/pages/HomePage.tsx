@@ -18,6 +18,7 @@ const HomePage = () => {
   const [attributes, setAttributes] = useState<Record<string, string[]>>({});
   const nav = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [page, setPage] = useState<number>(0);
 
   const updateAttributes = (newAttributes: Record<string, string[]>) => {
     // update the selected categories
@@ -75,8 +76,8 @@ const HomePage = () => {
         radius: selectedRadius,
         categories: [],
         status: "available",
-        limit: 500,
-        skip: 0,
+        limit: 40,
+        skip: page * 40,
         sort: "title",
         order: "asc",
         search: search,
@@ -89,7 +90,7 @@ const HomePage = () => {
           console.error(error);
         });
     }, 300),
-    [search, selectedRadius, location, attributes]
+    [search, selectedRadius, location, attributes, page]
   ); //dependencies for the debounced function
 
   useEffect(() => {
@@ -145,9 +146,9 @@ const HomePage = () => {
           <AttributeSelector onAttributesChange={updateAttributes} />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">
-          {items &&
-            items.map((item) => (
+        {items && items.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">
+            {items.map((item) => (
               <div
                 key={item.id}
                 className="card card-compact w-full md:w-75 bg-base-100 shadow-xl hover:scale-105 cursor-pointer transform transition-transform"
@@ -207,6 +208,42 @@ const HomePage = () => {
                 </div>
               </div>
             ))}
+          </div>
+        )}
+
+        {items && items.length === 0 && (
+          <div className="flex flex-col items-center justify-center h-full">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">
+              No items found
+            </h2>
+            <p className="text-gray-600">
+              Try adjusting your search or filters to find what you're looking
+              for.
+            </p>
+          </div>
+        )}
+
+        <div className="flex justify-center mt-8">
+          <div className="join">
+            <button
+              className="join-item btn"
+              onClick={() => {
+                if (page === 0) return;
+                setPage(page - 1);
+              }}
+            >
+              «
+            </button>
+            <button className="join-item btn">Page {page + 1}</button>
+            <button
+              className="join-item btn"
+              onClick={() => {
+                setPage(page + 1);
+              }}
+            >
+              »
+            </button>
+          </div>
         </div>
       </div>
     </div>
