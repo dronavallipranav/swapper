@@ -144,20 +144,6 @@ export const NewItemPage = () => {
               />
             </div>
             <div className="mt-4">
-              <label htmlFor="categories" className="block">
-                Categories (comma-separated)
-              </label>
-              <input
-                type="text"
-                id="categories"
-                value={categories}
-                onChange={(e) => setCategories(e.target.value)}
-                className="w-full px-4 py-2 mt-2 border rounded-md"
-                required
-              />
-            </div>
-
-            <div className="mt-4">
               <label htmlFor="images" className="block">
                 Images
               </label>

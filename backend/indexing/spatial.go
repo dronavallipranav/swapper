@@ -47,7 +47,8 @@ select new {
 	Attributes_ShippingOptions = item.attributes.shippingOptions,
 	Attributes_OwnershipHistory = item.attributes.ownershipHistory,
 	Attributes_Authenticity = item.attributes.authenticity,
-	Categories = item.categories
+	Categories = item.categories,
+	CreatedAt = item.createdAt
 }`
 	// Configure index options
 	res.Index("Query", ravendb.FieldIndexingSearch)
@@ -69,6 +70,7 @@ select new {
 	res.Store("Attributes_OwnershipHistory", ravendb.FieldStorageYes)
 	res.Store("Attributes_Authenticity", ravendb.FieldStorageYes)
 	res.Store("Categories", ravendb.FieldStorageYes)
+	res.Store("CreatedAt", ravendb.FieldStorageYes)
 
 	return res
 }

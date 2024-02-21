@@ -314,6 +314,18 @@ func (h *ItemHandler) GetItems(c *gin.Context) {
 		q = q.CloseSubclause()*/
 	}
 
+	if c.Query("skip") != "" {
+		offset, err := strconv.Atoi(c.Query("skip"))
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid offset"})
+			return
+		}
+		q = q.Skip(offset)
+	}
+
+	// sort by time desc
+	q = q.OrderByDescending("CreatedAt")
+
 	q = q.Take(limit)
 	err = q.GetResults(&items)
 	if err != nil {
