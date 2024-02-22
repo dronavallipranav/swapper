@@ -18,13 +18,13 @@ const UserProfile = () => {
   const nav = useNavigate();
   const {user} = useAuth();
   useEffect(() => {
-    getUser("users/" + userID).then((user) => {
+    getUser(`${userID}`).then((user) => {
       setUserPage(user);
     }).catch((e) => {
       console.error(e);
     })
 
-    fetchItemsByUserId("users/" + userID).then((items) => {
+    fetchItemsByUserId(`${userID}`).then((items) => {
       setItems(items);
     }).catch((e) => {
       console.error(e);
