@@ -151,7 +151,7 @@ const ItemPage = () => {
                 {owner && (
                   <div className="flex items-center gap-4 mb-4">
                     <div className="shrink-0">
-                      <ProfilePictureOrInitial user={owner} />
+                      <ProfilePictureOrInitial user={owner} linkToProfile={true} />
                     </div>
                     <div>
                       <h3 className="text-lg font-medium text-gray-900">

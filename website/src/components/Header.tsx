@@ -94,7 +94,7 @@ const Header = () => {
           {isAuthenticated && user ? (
             <div className="dropdown dropdown-end">
               <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
-                <ProfilePictureOrInitial user={user} />
+                <ProfilePictureOrInitial user={user} linkToProfile={false} />
               </label>
               <ul
                 tabIndex={0}

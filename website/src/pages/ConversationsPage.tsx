@@ -30,6 +30,11 @@ const ConversationsPage: React.FC = () => {
         const { data } = await api.get<{ conversations: Message[] }>(
           "/messages/conversations"
         );
+
+        if (!data.conversations) {
+          return;
+        }
+
         setConversations(data.conversations);
 
         // Extract unique participant IDs
@@ -79,7 +84,12 @@ const ConversationsPage: React.FC = () => {
   }
 
   if (!conversations.length) {
-    return <div className="text-center p-4">No messages yet.</div>;
+    return (
+      <div>
+        <Header />
+        <div className="text-center p-4">No messages yet.</div>
+      </div>
+    );
   }
 
   return (
@@ -103,7 +113,7 @@ const ConversationsPage: React.FC = () => {
                 onClick={() => navigate(url)}
               >
                 <div className="flex items-center gap-2">
-                  <ProfilePictureOrInitial user={otherUser} />
+                  <ProfilePictureOrInitial user={otherUser} linkToProfile={true} />
                   <div className="flex flex-col flex-grow">
                     <div className="flex justify-between items-center">
                       <span className="font-bold">
