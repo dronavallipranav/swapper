@@ -16,7 +16,6 @@ import { fetchUserRatings } from '../../services/RatingService';
 
 const UserProfile = () => {
   const { userID } = useParams();
-  console.log(userID);
   const [userPage, setUserPage] = useState<User | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const [ratings, setRatings] = useState<Rating[]>([]);
@@ -25,7 +24,7 @@ const UserProfile = () => {
 
 
   useEffect(() => {
-    getUser(`users/${userID}`).then((user) => {
+    getUser(`${userID}`).then((user) => {
       setUserPage(user);
     }).catch((e) => {
       console.error(e);

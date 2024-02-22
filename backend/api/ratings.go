@@ -43,7 +43,6 @@ func (h *RatingHandler) CreateRating(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
 		return
 	}
-
 	userID, exists := c.Get("userID")
 	if !exists || userID.(string) == req.RecipientID {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot rate yourself or Unauthorized"})

@@ -56,6 +56,7 @@ const AddRating: React.FC<AddRatingProps> = ({
     }
 
     try {
+      console.log(ratingData);
       createRating(ratingData)
         .then(() => {
           onSuccess();

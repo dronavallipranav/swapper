@@ -105,7 +105,7 @@ const Ratings: React.FC<RatingsProps> = ({
 
           <div className="mt-4">
             <Link
-              to={`/profile/${rating.creatorID}`}
+              to={`/profile/${encodeURIComponent(rating.creatorID)}`}
               className="text-blue-500 underline"
             >
               {users[rating.creatorID]?.name}

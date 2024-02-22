@@ -31,7 +31,7 @@ const ProfilePictureOrInitial: React.FC<{
         }`}
         onClick={() => {
           if (linkToProfile && user) {
-            nav(`/profile/${user.id.replace("users/", "")}`);
+            nav(`/profile/${encodeURIComponent(user.id)}`);
           }
         }}
         >
