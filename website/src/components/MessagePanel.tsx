@@ -204,7 +204,7 @@ const MessagePanel: React.FC = () => {
             </div>
           )}
         </div>
-        <div className="send-message-form mt-4 flex gap-2">
+        <div className="send-message-form mt-4 rounded-xl flex gap-2">
           <textarea
             className="textarea textarea-bordered flex-1 p-2"
             value={newMessage}
