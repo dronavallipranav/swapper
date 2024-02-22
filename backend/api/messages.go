@@ -189,6 +189,6 @@ func (h *MessageHandler) GetMessageHistory(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query messages"})
 		return
 	}
-	fmt.Println(messages)
+
 	c.JSON(http.StatusOK, gin.H{"messages": messages})
 }
