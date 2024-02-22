@@ -103,7 +103,7 @@ const MessagePanel: React.FC = () => {
   return (
     <div>
       <Header />
-      <div className="message-panel p-4 flex flex-col justify-between h-full bg-gray-100 min-h-screen">
+      <div className="message-panel p-4 flex flex-col justify-between h-full min-h-screen">
         <div
           ref={messagesEndRef}
           className="messages overflow-y-auto flex flex-col gap-2"
@@ -145,8 +145,8 @@ const MessagePanel: React.FC = () => {
                         >
                           <span className="font-bold">
                             {msg.senderID === currentUserID
-                              ? user?.name
-                              : otherUser?.name}
+                              ? user?.username
+                              : otherUser?.username}
                           </span>
                           <time className="text-xs opacity-50 ml-2">
                             {new Date(msg.sentAt).toLocaleTimeString()}
