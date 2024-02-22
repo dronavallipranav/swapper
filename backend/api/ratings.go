@@ -31,7 +31,7 @@ func (h *RatingHandler) RegisterRatingRoutes(r *gin.Engine) {
 type CreateRatingRequest struct {
 	CreatorID       string `json:"creatorID" binding:"required"`
 	RecipientID     string `json:"recipientID" binding:"required,nefield=CreatorID"`
-	RecipientIsItem bool   `json:"recipientIsItem" binding:"required"`
+	RecipientIsItem bool   `json:"recipientIsItem"`
 	Title           string `json:"title" binding:"required"`
 	Body            string `json:"body" binding:"required"`
 	Stars           int    `json:"stars" binding:"required,numeric,min=1,max=10"`
@@ -43,6 +43,7 @@ func (h *RatingHandler) CreateRating(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request", "details": err.Error()})
 		return
 	}
+
 	userID, exists := c.Get("userID")
 	if !exists || userID.(string) == req.RecipientID {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Cannot rate yourself or Unauthorized"})

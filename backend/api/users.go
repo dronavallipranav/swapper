@@ -35,7 +35,7 @@ func (h *UserHandler) RegisterUserRoutes(r *gin.Engine) {
 	r.POST("/login", h.LoginUser)
 	r.PUT("/user", middleware.AuthMiddleware(), h.UpdateUser)
 	r.GET("/users/:id", h.GetUser)
-	r.GET("/users/:id/ratings", middleware.AuthMiddleware(), h.GetUserRatings)
+	r.GET("/users/:id/ratings", h.GetUserRatings)
 	r.GET("/users/:id/items", h.GetUserItems)
 }
 
@@ -479,7 +479,7 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 }
 
 func (h *UserHandler) GetUserRatings(c *gin.Context) {
-	userID := c.Param("id") // Assuming you want to fetch ratings for the user specified in the URL
+	userID := "users/" + c.Param("id") // Assuming you want to fetch ratings for the user specified in the URL
 
 	session, err := h.Store.OpenSession("")
 	if err != nil {
