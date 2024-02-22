@@ -16,6 +16,7 @@ const MessagePanel: React.FC = () => {
   const [otherUser, setOtherUser] = useState<User | null>(null);
   const [groupedMessages, setGroupedMessages] = useState<GroupedMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [prevMessageCount, setPrevMessageCount] = useState(messages.length);
 
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
@@ -102,13 +103,18 @@ const MessagePanel: React.FC = () => {
   }, [user, userID]);
 
   useEffect(() => {
+
     if (messages.length > 0) {
       const groupedMessages = groupMessages(messages);
       setGroupedMessages(groupedMessages);
     }
-    scrollToBottom();
+
+    if (messages.length > prevMessageCount) {
+      scrollToBottom();
+    }
+    setPrevMessageCount(messages.length);
   }, [messages]);
-  
+
   return (
     <div>
       <Header />
