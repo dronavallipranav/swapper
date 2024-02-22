@@ -6,7 +6,6 @@ type Attributes struct {
 	Condition        string `json:"condition" form:"condition" validate:"omitempty,oneof=new used refurbished"`
 	Size             string `json:"size" form:"size" validate:"omitempty,oneof=small medium large"`
 	Color            string `json:"color" form:"color" validate:"omitempty,oneof=red green blue black white yellow orange purple pink brown"`
-	ShippingOptions  string `json:"shippingOptions" form:"shippingOptions" validate:"omitempty,oneof=localPickup domesticShipping internationalShipping"`
 	ListingType      string `json:"listingType" form:"listingType" validate:"omitempty,oneof=sale rent exchange"`
 	ItemCategory     string `json:"itemCategory" form:"itemCategory" validate:"omitempty,oneof=electronics homeAndGarden fashion beauty health sports outdoors automotive books music games toys collectibles art crafts clothing baby beauty petSupplies travel"`
 	OwnershipHistory string `json:"ownershipHistory" form:"ownershipHistory" validate:"omitempty,oneof=firstOwner secondOwner multipleOwners"`
