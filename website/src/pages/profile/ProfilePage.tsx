@@ -3,34 +3,32 @@ import { useNavigate, useParams } from 'react-router-dom';
 import api from "../../services/AxiosInterceptor";
 import { Item } from '../../models/Item';
 import { getUser } from "../../services/AuthService";
-import { get } from 'lodash';
+import { get, set } from 'lodash';
 import Header from '../../components/Header';
 import { User } from '../../models/User';
 import ProfilePictureOrInitial from '../../components/ProfilePictureOrInitial';
 import { filledStar } from '../../components/Ratings/StarRating';
 import { useAuth } from "../../contexts/AuthContext";
+import { fetchItemsByUserId } from '../../services/ItemService';
 
 const UserProfile = () => {
-  const { userID } = useParams<{ userID: string }>();
+  const { userID } = useParams();
   const [userPage, setUserPage] = useState<User | null>(null);
   const [items, setItems] = useState<Item[]>([]);
   const nav = useNavigate();
   const {user} = useAuth();
   useEffect(() => {
-    const fetchItems = async () => {
-        try {
-          const response = await api.get<{ items: Item[] }>(
-            `/users/items?UserID=${encodeURIComponent(userID as string)}`
-          );
-          setItems(response.data.items);
-        } catch (error) {
-          console.error("Failed to load messages:", error);
-        }
-      };
-      getUser(userID as string).then((fetchedUser) => {
-        setUserPage(fetchedUser);
-      });
-      fetchItems();
+    getUser("users/" + userID).then((user) => {
+      setUserPage(user);
+    }).catch((e) => {
+      console.error(e);
+    })
+
+    fetchItemsByUserId("users/" + userID).then((items) => {
+      setItems(items);
+    }).catch((e) => {
+      console.error(e);
+    })
   }, [userID]);
 
   const isCurrentUser = user?.id === userID; 

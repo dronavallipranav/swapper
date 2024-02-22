@@ -92,7 +92,7 @@ const Ratings: React.FC<RatingsProps> = ({
         >
           <div className="flex items-center space-x-4">
             <div className="flex-shrink-0">
-              <ProfilePictureOrInitial user={users[rating.creatorID]} />
+              <ProfilePictureOrInitial user={users[rating.creatorID]} linkToProfile={true} />
             </div>
             <div>
               <div className="flex items-center space-x-2">

@@ -144,7 +144,7 @@ const MessagePanel: React.FC = () => {
                         } items-center gap-2`}
                       >
                         <div className="chat-image avatar">
-                          <ProfilePictureOrInitial
+                          <ProfilePictureOrInitial linkToProfile={true}
                             user={
                               msg.senderID === currentUserID ? user : otherUser
                             }
