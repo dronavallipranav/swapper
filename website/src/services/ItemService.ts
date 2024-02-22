@@ -8,7 +8,7 @@ export const fetchItemById = async (itemId: string): Promise<Item> => {
 };
 
 export const fetchItemsByUserId = async (userId: string): Promise<Item[]> => {
-  const response = await api.get<{ items: Item[] }>(`/users/${userId}/items`);
+  const response = await api.get<{ items: Item[] }>(`${userId}/items`);
   return response.data.items;
 }
 

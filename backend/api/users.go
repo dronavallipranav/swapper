@@ -36,7 +36,7 @@ func (h *UserHandler) RegisterUserRoutes(r *gin.Engine) {
 	r.PUT("/user", middleware.AuthMiddleware(), h.UpdateUser)
 	r.GET("/users/:id", h.GetUser)
 	r.GET("/users/:id/ratings", middleware.AuthMiddleware(), h.GetUserRatings)
-	r.GET("/users/items", h.GetUserItems)
+	r.GET("/users/:id/items", h.GetUserItems)
 }
 
 type SignUpRequest struct {
@@ -504,14 +504,14 @@ func (h *UserHandler) GetUserRatings(c *gin.Context) {
 
 // gets user items
 func (h *UserHandler) GetUserItems(c *gin.Context) {
-	userID := c.Query("UserID")
-
+	userID := c.Param("id")
+	userID = "users/" + userID
 	// Check if userID is empty and handle accordingly
 	if userID == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID parameter is required"})
 		return
 	}
-	fmt.Println("userID", userID)
+
 	session, err := h.Store.OpenSession("")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
