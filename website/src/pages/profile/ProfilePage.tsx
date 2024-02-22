@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import api from "../../services/AxiosInterceptor";
-import { Item } from '../../models/Item';
+import { Item } from "../../models/Item";
 import { getUser } from "../../services/AuthService";
-import { get, set } from 'lodash';
-import Header from '../../components/Header';
-import { User } from '../../models/User';
-import ProfilePictureOrInitial from '../../components/ProfilePictureOrInitial';
-import { filledStar } from '../../components/Ratings/StarRating';
+import { get, set } from "lodash";
+import Header from "../../components/Header";
+import { User } from "../../models/User";
+import ProfilePictureOrInitial from "../../components/ProfilePictureOrInitial";
+import { filledStar } from "../../components/Ratings/StarRating";
 import { useAuth } from "../../contexts/AuthContext";
-import { fetchItemsByUserId } from '../../services/ItemService';
-import Ratings from '../../components/Ratings/Ratings';
-import { Rating } from '../../models/Rating';
-import { fetchUserRatings } from '../../services/RatingService';
+import { fetchItemsByUserId } from "../../services/ItemService";
+import Ratings from "../../components/Ratings/Ratings";
+import { Rating } from "../../models/Rating";
+import { fetchUserRatings } from "../../services/RatingService";
 
 const UserProfile = () => {
   const { userID } = useParams();
@@ -20,65 +20,67 @@ const UserProfile = () => {
   const [items, setItems] = useState<Item[]>([]);
   const [ratings, setRatings] = useState<Rating[]>([]);
   const nav = useNavigate();
-  const {user} = useAuth();
-
+  const { user } = useAuth();
 
   useEffect(() => {
-    getUser(`${userID}`).then((user) => {
-      setUserPage(user);
-    }).catch((e) => {
-      console.error(e);
-    })
-    
-    fetchItemsByUserId(`${userID}`).then((items) => {
-      setItems(items);
-    }).catch((e) => {
-      console.error(e);
-    })
+    getUser(`${userID}`)
+      .then((user) => {
+        setUserPage(user);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+
+    fetchItemsByUserId(`${userID}`)
+      .then((items) => {
+        setItems(items);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }, [userID]);
 
-  const isCurrentUser = user?.id === userID; 
+  const isCurrentUser = user?.id === userID;
 
   useEffect(() => {
-    fetchUserRatings(`${userID}`)
-    .then((fetchedRatings: Rating[]) => {
+    fetchUserRatings(`${userID}`).then((fetchedRatings: Rating[]) => {
       setRatings(fetchedRatings);
     });
-}, [userID]);
+  }, [userID]);
 
   return (
     <div className="pb-8">
-      <Header/>
+      <Header />
       <div className="container mx-auto px-4 py-10">
         <div className="text-center py-4">
-        <h1 className="text-4xl font-bold">{userPage?.username}</h1>
-        <h2 className="text-xl text-gray-600">{userPage?.username}'s Rating: <span className="w-3 h-3 inline-block mr-1">
-                        {filledStar}
-                      </span> {userPage?.avgRating} </h2>
-                      {isCurrentUser && (
+          <h1 className="text-4xl font-bold">{userPage?.username}</h1>
+          <h2 className="text-xl text-gray-600">
+            {userPage?.username}'s Rating:{" "}
+            <span className="w-3 h-3 inline-block mr-1">{filledStar}</span>{" "}
+            {userPage?.avgRating}{" "}
+          </h2>
+          {isCurrentUser && (
             <div className="mt-4">
-              <button
-                onClick={() => nav('/profile/settings')}
-                className="btn"
-              >
+              <button onClick={() => nav("/profile/settings")} className="btn">
                 Edit Profile
               </button>
             </div>
           )}
-           {!isCurrentUser && userPage?.id &&(
-          <div className="mt-4">
-            <button
-              onClick={() => nav(`/messages/${encodeURIComponent(userPage?.id)}`)}
-              className="btn"
-            >
-              Contact
-            </button>
-          </div>
-        )}
+          {!isCurrentUser && userPage?.id && (
+            <div className="mt-4">
+              <button
+                onClick={() =>
+                  nav(`/messages/${encodeURIComponent(userPage?.id)}`)
+                }
+                className="btn"
+              >
+                Contact
+              </button>
+            </div>
+          )}
           <h1 className="text-3xl mt-10 font-bold">Current Items</h1>
-
         </div>
-      {items && items.length > 0 && (
+        {items && items.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">
             {items.map((item) => (
               <div
@@ -150,17 +152,16 @@ const UserProfile = () => {
             </h2>
           </div>
         )}
-        </div>  
+      </div>
 
-          <div className="mt-8">
-          <Ratings
-            ratings={ratings || []}
-            recipientID={userID}
-            recipientIsItem={false}
-          />
-          </div>
-        
-        </div>
+      <div className="mt-8 p-8">
+        <Ratings
+          ratings={ratings || []}
+          recipientID={userID}
+          recipientIsItem={false}
+        />
+      </div>
+    </div>
   );
 };
 
