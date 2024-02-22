@@ -7,7 +7,14 @@ import { useNavigate } from "react-router-dom";
 import { debounce, fill } from "lodash";
 import HomeHeader from "../components/HomeHeader";
 import { filledStar } from "../components/Ratings/StarRating";
-
+import ElectronicsIcon from "../assets/Electronics.svg";
+import ClothingIcon from "../assets/Clothing.svg";
+import BooksIcon from "../assets/Books.svg";
+import HomeGardenIcon from "../assets/Garden.svg";
+import CarIcon from "../assets/Car.svg";
+import SportsIcon from "../assets/Sports.svg";
+import ToysIcon from "../assets/Toys.svg";
+import { fetchItemAttributes } from "../services/ItemService";
 const HomePage = () => {
   const [items, setItems] = useState<Item[] | null>(null);
   const [search, setSearch] = useState("");
@@ -18,6 +25,7 @@ const HomePage = () => {
   const [attributes, setAttributes] = useState<Record<string, string[]>>({});
   const nav = useNavigate();
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>([]);
   const [page, setPage] = useState<number>(0);
 
   const updateAttributes = (newAttributes: Record<string, string[]>) => {
@@ -25,6 +33,30 @@ const HomePage = () => {
     setSelectedCategories(newAttributes.itemCategories || []);
     setAttributes(newAttributes);
   };
+
+  const categoryIcons: Record<string, string> = {
+    Electronics: ElectronicsIcon,
+    Clothing: ClothingIcon,
+    Books: BooksIcon,
+    "Home And Garden": HomeGardenIcon,
+    Sports: SportsIcon,
+    Toys: ToysIcon,
+    Automotive: CarIcon,
+  };
+
+  function toTitleCaseWithSpaces(str: string) {
+    return str
+      .replace(/([A-Z])/g, " $1")
+      .trim()
+      .replace(/^./, (firstChar) => firstChar.toUpperCase());
+  }
+  useEffect(() => {
+    fetchItemAttributes()
+      .then((attributes) => {
+        setCategories(["All", ...attributes.itemCategory]);
+      })
+      .catch((e) => {});
+  }, []);
 
   useEffect(() => {
     setAttributes((prev) => {
@@ -54,6 +86,7 @@ const HomePage = () => {
     });
   }, [selectedCategories, setAttributes]);
 
+  
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
     // check if its a child of the attributeSelectorRef,
     // if it is a click on the attributeSelectorRef we should stop propagation
@@ -98,7 +131,7 @@ const HomePage = () => {
   }, [fetchItemsDebounced]); //call the debounced function when the search changes
 
   return (
-    <div className="pb-8">
+    <div>
       <HomeHeader
         search={search}
         setSearch={setSearch}
@@ -111,7 +144,7 @@ const HomePage = () => {
         selectedCategories={selectedCategories}
         setSelectedCategories={setSelectedCategories}
       />
-      <div className="container mx-auto px-4 py-10">
+      <div className="container mx-auto px-4 pt-4">
         <div
           className={`fixed inset-0 z-40 transform ${
             isFilterVisible ? "translate-x-0" : "-translate-x-full"
@@ -145,6 +178,58 @@ const HomePage = () => {
 
           <AttributeSelector onAttributesChange={updateAttributes} />
         </div>
+
+        <div className="flex justify-center pb-4 flex-wrap gap-2">
+        {/* Ignore categories without buttons mapped to them */}
+        {categories &&
+          categories.map(
+            (category, index) =>
+              (categoryIcons[toTitleCaseWithSpaces(category)] ||
+                category == "All") && (
+                <button
+                  key={index}
+                  className={`btn ${
+                    selectedCategories && selectedCategories.includes(category)
+                      ? "btn-active"
+                      : ""
+                  }`}
+                  onClick={() => {
+                    const isSelected = selectedCategories.includes(category);
+                    if (isSelected) {
+                      // Remove the category from the selection
+                      setSelectedCategories(
+                        selectedCategories.filter((c) => c !== category)
+                      );
+                    } else {
+                      // Add the category to the selection
+                      // if we've selected "All", clear the selection and select only "All"
+                      if (category === "All") {
+                        setSelectedCategories(["All"]);
+                      } else if (selectedCategories.includes("All")) {
+                        setSelectedCategories([category]);
+                      } else {
+                        // we need to make sure the result ends as unique
+                        // so we don't have duplicate categories in the selection
+                        setSelectedCategories([
+                          ...selectedCategories,
+                          category,
+                        ]);
+                      }
+                    }
+                  }}
+                >
+                  {categoryIcons[toTitleCaseWithSpaces(category)] ? (
+                    <img
+                      src={categoryIcons[toTitleCaseWithSpaces(category)]}
+                      alt={category}
+                      className="w-4 h-4 mr-2"
+                    />
+                  ) : null}
+                  {toTitleCaseWithSpaces(category)}
+                </button>
+              )
+          )}
+      </div>
 
         {items && items.length > 0 && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 xl:grid-cols-4 justify-items-center">

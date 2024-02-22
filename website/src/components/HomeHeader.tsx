@@ -12,6 +12,7 @@ import CarIcon from "../assets/Car.svg";
 import SportsIcon from "../assets/Sports.svg";
 import ToysIcon from "../assets/Toys.svg";
 import { fetchItemAttributes } from "../services/ItemService";
+import Logo from '../assets/Swapper.svg';
 
 const categoryIcons: Record<string, string> = {
   Electronics: ElectronicsIcon,
@@ -73,7 +74,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
   };
 
   return (
-    <div className="bg-base-100 border-2 border-base-200 px-4 py-2">
+    <div className="bg-base-100 border-2 border-base-200 px-4 py-2 pb-4">
       <div className="flex justify-between items-center">
         {/* Left Section: Logo and Mobile Menu Toggle */}
         <div className="flex items-center space-x-4">
@@ -93,7 +94,8 @@ const HomeHeader: React.FC<HeaderProps> = ({
               />
             </svg>
           </button>
-          <Link to="/" className="btn btn-ghost normal-case text-xl">
+          <Link to="/" className="btn btn-ghost ml-6 normal-case text-sky-500 text-xl">
+          <img src={Logo} alt="Logo" className="w-6 h-6 mr-1" />
             Swapper
           </Link>
         </div>
@@ -235,7 +237,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
         </div>
 
         <button
-          className="text-white bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-4 py-2"
+          className="text-white bg-sky-500 hover:bg-sky-600 focus:outline-none rounded-lg px-4 py-2"
           onClick={() => setIsFilterVisible(!isFilterVisible)}
         >
           All Filters
@@ -277,63 +279,12 @@ const HomeHeader: React.FC<HeaderProps> = ({
           </div>
 
           <button
-            className="ml-4 mr-4 text-white bg-blue-500 hover:bg-blue-600 focus:outline-none rounded-lg px-4 py-2 flex-shrink-0"
+            className="ml-4 mr-4 text-white bg-sky-500 hover:bg-sky-600 focus:outline-none rounded-lg px-4 py-2 flex-shrink-0"
             onClick={() => setIsFilterVisible(!isFilterVisible)}
           >
             All Filters
           </button>
         </div>
-      </div>
-      <div className="mt-4 flex justify-center flex-wrap gap-2">
-        {/* Ignore categories without buttons mapped to them */}
-        {categories &&
-          categories.map(
-            (category, index) =>
-              (categoryIcons[toTitleCaseWithSpaces(category)] ||
-                category == "All") && (
-                <button
-                  key={index}
-                  className={`btn ${
-                    selectedCategories && selectedCategories.includes(category)
-                      ? "btn-active"
-                      : ""
-                  }`}
-                  onClick={() => {
-                    const isSelected = selectedCategories.includes(category);
-                    if (isSelected) {
-                      // Remove the category from the selection
-                      setSelectedCategories(
-                        selectedCategories.filter((c) => c !== category)
-                      );
-                    } else {
-                      // Add the category to the selection
-                      // if we've selected "All", clear the selection and select only "All"
-                      if (category === "All") {
-                        setSelectedCategories(["All"]);
-                      } else if (selectedCategories.includes("All")) {
-                        setSelectedCategories([category]);
-                      } else {
-                        // we need to make sure the result ends as unique
-                        // so we don't have duplicate categories in the selection
-                        setSelectedCategories([
-                          ...selectedCategories,
-                          category,
-                        ]);
-                      }
-                    }
-                  }}
-                >
-                  {categoryIcons[toTitleCaseWithSpaces(category)] ? (
-                    <img
-                      src={categoryIcons[toTitleCaseWithSpaces(category)]}
-                      alt={category}
-                      className="w-4 h-4 mr-2"
-                    />
-                  ) : null}
-                  {toTitleCaseWithSpaces(category)}
-                </button>
-              )
-          )}
       </div>
     </div>
   );

@@ -160,7 +160,7 @@ export const NewItemPage = () => {
                 onClick={() =>
                   fileInputRef.current && fileInputRef.current.click()
                 }
-                className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-700"
+                className="mt-2 px-4 py-2 bg-sky-500 text-white rounded-md hover:bg-sky-600"
               >
                 Add Another Image
               </button>
@@ -261,7 +261,7 @@ export const NewItemPage = () => {
             <div className="flex justify-end mt-6">
               <button
                 type="submit"
-                className="px-6 py-2 leading-5 text-white transition-colors duration-200 transform bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
+                className="px-6 py-2 leading-5 text-white transition-colors duration-200 transform bg-sky-500 rounded-md hover:bg-sky-600 focus:outline-none focus:bg-sky-600"
               >
                 List Item
               </button>
