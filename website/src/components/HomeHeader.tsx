@@ -167,7 +167,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
                 className="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52"
               >
                 <li>
-                  <Link to="/profile">Profile</Link>
+                  <Link to={`/profile/${encodeURIComponent(user.id)}`}>Profile</Link>
                 </li>
                 <li>
                   <Link to="/logout">Logout</Link>
