@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import ProfilePictureOrInitial from "./ProfilePictureOrInitial";
 import { getUser } from "../services/AuthService";
@@ -7,6 +7,8 @@ import api from "../services/AxiosInterceptor";
 import { Message } from "../models/Message";
 import { User } from "../models/User";
 import Header from "./Header";
+import Link from "react-router-dom";
+
 const MessagePanel: React.FC = () => {
   const { user } = useAuth();
   const currentUserID: string = user?.id as string;
@@ -17,6 +19,7 @@ const MessagePanel: React.FC = () => {
   const [groupedMessages, setGroupedMessages] = useState<GroupedMessage[]>([]);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [prevMessageCount, setPrevMessageCount] = useState(messages.length);
+  const nav = useNavigate();
 
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
@@ -144,11 +147,13 @@ const MessagePanel: React.FC = () => {
                         } items-center gap-2`}
                       >
                         <div className="chat-image avatar">
+                         
                           <ProfilePictureOrInitial linkToProfile={true}
                             user={
                               msg.senderID === currentUserID ? user : otherUser
                             }
                           />
+                  
                         </div>
                         <div
                           className={`chat-header text-sm ${
