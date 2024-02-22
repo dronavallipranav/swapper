@@ -107,7 +107,7 @@ const ConversationsPage: React.FC = () => {
                   <div className="flex flex-col flex-grow">
                     <div className="flex justify-between items-center">
                       <span className="font-bold">
-                        {otherUser?.name || "Unknown"}
+                        {otherUser?.username || "Unknown"}
                       </span>
                       <span className="text-xs text-gray-500">
                         {new Date(message.sentAt).toLocaleTimeString()}

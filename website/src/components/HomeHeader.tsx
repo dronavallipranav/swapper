@@ -94,7 +94,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
               />
             </svg>
           </button>
-          <Link to="/" className="btn btn-ghost ml-6 normal-case text-sky-500 text-xl">
+          <Link to="/" className="btn btn-ghost pl-6 normal-case text-sky-500 text-xl">
           <img src={Logo} alt="Logo" className="w-6 h-6 mr-1" />
             Swapper
           </Link>
@@ -244,7 +244,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
         </button>
       </div>
       <div className="hidden mt-4 md:flex justify-center items-center gap-2 w-full px-4">
-        <div className="flex items-center bg-white rounded-full shadow w-full max-w-4xl flex-wrap">
+        <div className="flex items-center bg-white hover:bg-gray-50 rounded-full shadow w-full max-w-4xl flex-wrap">
           <input
             type="text"
             value={search}
