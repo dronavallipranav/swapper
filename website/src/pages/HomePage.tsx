@@ -9,6 +9,7 @@ import HomeHeader from "../components/HomeHeader";
 import { filledStar } from "../components/Ratings/StarRating";
 import ElectronicsIcon from "../assets/Electronics.svg";
 import ClothingIcon from "../assets/Clothing.svg";
+import TravelIcon from "../assets/Travel.svg";
 import BooksIcon from "../assets/Books.svg";
 import HomeGardenIcon from "../assets/Garden.svg";
 import CarIcon from "../assets/Car.svg";
@@ -42,6 +43,7 @@ const HomePage = () => {
     Sports: SportsIcon,
     Toys: ToysIcon,
     Automotive: CarIcon,
+    Travel: TravelIcon
   };
 
   function toTitleCaseWithSpaces(str: string) {

@@ -14,16 +14,6 @@ import ToysIcon from "../assets/Toys.svg";
 import { fetchItemAttributes } from "../services/ItemService";
 import Logo from '../assets/Swapper.svg';
 
-const categoryIcons: Record<string, string> = {
-  Electronics: ElectronicsIcon,
-  Clothing: ClothingIcon,
-  Books: BooksIcon,
-  "Home And Garden": HomeGardenIcon,
-  Sports: SportsIcon,
-  Toys: ToysIcon,
-  Automotive: CarIcon,
-};
-
 interface HeaderProps {
   search: string;
   setSearch: React.Dispatch<React.SetStateAction<string>>;
