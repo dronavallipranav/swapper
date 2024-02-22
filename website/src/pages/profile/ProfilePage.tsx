@@ -10,20 +10,27 @@ import ProfilePictureOrInitial from '../../components/ProfilePictureOrInitial';
 import { filledStar } from '../../components/Ratings/StarRating';
 import { useAuth } from "../../contexts/AuthContext";
 import { fetchItemsByUserId } from '../../services/ItemService';
+import Ratings from '../../components/Ratings/Ratings';
+import { Rating } from '../../models/Rating';
+import { fetchUserRatings } from '../../services/RatingService';
 
 const UserProfile = () => {
   const { userID } = useParams();
+  console.log(userID);
   const [userPage, setUserPage] = useState<User | null>(null);
   const [items, setItems] = useState<Item[]>([]);
+  const [ratings, setRatings] = useState<Rating[]>([]);
   const nav = useNavigate();
   const {user} = useAuth();
+
+
   useEffect(() => {
-    getUser(`${userID}`).then((user) => {
+    getUser(`users/${userID}`).then((user) => {
       setUserPage(user);
     }).catch((e) => {
       console.error(e);
     })
-
+    
     fetchItemsByUserId(`${userID}`).then((items) => {
       setItems(items);
     }).catch((e) => {
@@ -32,6 +39,13 @@ const UserProfile = () => {
   }, [userID]);
 
   const isCurrentUser = user?.id === userID; 
+
+  useEffect(() => {
+    fetchUserRatings(`${userID}`)
+    .then((fetchedRatings: Rating[]) => {
+      setRatings(fetchedRatings);
+    });
+}, [userID]);
 
   return (
     <div className="pb-8">
@@ -138,6 +152,15 @@ const UserProfile = () => {
           </div>
         )}
         </div>  
+
+          <div className="mt-8">
+          <Ratings
+            ratings={ratings || []}
+            recipientID={userID}
+            recipientIsItem={false}
+          />
+          </div>
+        
         </div>
   );
 };
