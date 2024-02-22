@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import ProfilePictureOrInitial from "./ProfilePictureOrInitial";
-
+import Logo from "../assets/Swapper.svg";
 const Header = () => {
   const { isAuthenticated, user } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -29,7 +29,8 @@ const Header = () => {
               />
             </svg>
           </button>
-          <Link to="/" className="btn btn-ghost normal-case text-xl">
+          <Link to="/" className="btn btn-ghost normal-case text-sky-500 text-xl">
+          <img src={Logo} alt="Logo" className="w-6 h-6 mr-1" />
             Swapper
           </Link>
         </div>
