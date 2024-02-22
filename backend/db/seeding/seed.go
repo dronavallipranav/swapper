@@ -150,12 +150,14 @@ func Seed(store *ravendb.DocumentStore) {
 
 	lat_lon_arr := []models.Location{
 		{Latitude: 43.0731, Longitude: -89.4012},
-		{Latitude: 40.7127281, Longitude: 74.0060152},
+		{Latitude: 40.7127281, Longitude: -74.0060152},
 	}
 
 	if len(items) < max_products {
 		for i := len(items); i < max_products; i++ {
-			product := products[i]
+			// lets pick a random product from the products array, since I think they're pre-sorted
+			product := products[gofakeit.Number(0, len(products)-1)]
+
 			if i%1000 == 0 {
 				fmt.Printf("Seeding product %d of %d\n", i, max_products)
 			}
@@ -179,17 +181,8 @@ func Seed(store *ravendb.DocumentStore) {
 						Categories:  []string{},
 						Status:      "available",
 						Location:    lat_lon_arr[i%len(lat_lon_arr)],
-						Attributes: models.Attributes{
-							Condition:        RandString([]string{"new", "used", "refurbished"}),
-							Size:             RandString([]string{"small", "medium", "large"}),
-							Color:            RandString([]string{"red", "green", "blue", "black", "white", "yellow", "orange", "purple", "pink", "brown"}),
-							ShippingOptions:  RandString([]string{"localPickup", "domesticShipping", "internationalShipping"}),
-							ListingType:      RandString([]string{"sale", "rent", "exchange"}),
-							ItemCategory:     dbCat,
-							OwnershipHistory: RandString([]string{"firstOwner", "secondOwner", "multipleOwners"}),
-							Authenticity:     RandString([]string{"authentic", "replica", "unauthorized"}),
-						},
-						CreatedAt: time.Now(),
+						Attributes:  InferAttributes(product, dbCat),
+						CreatedAt:   time.Now(),
 					}
 
 					if product.ImgURL == "" {
@@ -387,10 +380,6 @@ func untarGz(tgzFile, destDir string) error {
 	}
 
 	return nil
-}
-
-func RandString(arr []string) string {
-	return arr[gofakeit.Number(0, len(arr)-1)]
 }
 
 func GetItemCategory(id int) string {

@@ -47,7 +47,7 @@ func main() {
 	}
 
 	// Seed the database
-	// seeding.Seed(documentStore)
+	//seeding.Seed(documentStore)
 
 	setupRoutes(r, documentStore)
 
