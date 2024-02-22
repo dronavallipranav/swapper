@@ -1,10 +1,16 @@
 package seeding
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/csv"
 	"io"
+	"mime"
 	"os"
 	"strconv"
+	"swapper/models"
+
+	"github.com/ravendb/ravendb-go-client"
 )
 
 type Product struct {
@@ -108,4 +114,62 @@ func ParseCategoriesCSV(filePath string) ([]Category, error) {
 		categories = append(categories, category)
 	}
 	return categories, nil
+}
+
+func CreateItem(i *models.Item, store *ravendb.DocumentStore) (string, error) {
+	session, err := store.OpenSession("")
+	if err != nil {
+		return "", err
+	}
+	defer session.Close()
+
+	err = session.Store(i)
+	if err != nil {
+		return "", err
+	}
+
+	// Save changes
+	err = session.SaveChanges()
+	if err != nil {
+		return "", err
+	}
+
+	return i.ID, nil
+}
+
+func AddProductAttachments(base64Encoded []string, i *models.Item, store *ravendb.DocumentStore) error {
+	for loopI, img := range base64Encoded {
+		fileBytes, err := base64.StdEncoding.DecodeString(img)
+		if err != nil {
+			return err
+		}
+		// Now, convert fileBytes back into a stream for the .Store method
+		byteReader := bytes.NewReader(fileBytes)
+		mimeType := mime.TypeByExtension("image/png")
+
+		session, err := store.OpenSession("")
+		if err != nil {
+			return err
+		}
+		defer session.Close()
+
+		// retrieve user
+		err = session.Load(&i, i.ID)
+		if err != nil {
+			return err
+		}
+
+		// Store the byteReader as an attachment
+		err = session.Advanced().Attachments().Store(i, "item_"+string(loopI)+".png", byteReader, mimeType)
+		if err != nil {
+			return err
+		}
+
+		// Save changes
+		err = session.SaveChanges()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
