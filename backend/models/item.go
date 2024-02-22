@@ -8,7 +8,7 @@ type Attributes struct {
 	Color            string `json:"color" form:"color" validate:"omitempty,oneof=red green blue black white yellow orange purple pink brown"`
 	ShippingOptions  string `json:"shippingOptions" form:"shippingOptions" validate:"omitempty,oneof=localPickup domesticShipping internationalShipping"`
 	ListingType      string `json:"listingType" form:"listingType" validate:"omitempty,oneof=sale rent exchange"`
-	ItemCategory     string `json:"itemCategory" form:"itemCategory" validate:"omitempty,oneof=electronics homeAndGarden fashion beauty health sports outdoors automotive books music games toys collectibles art crafts clothing baby beauty petSupplies"`
+	ItemCategory     string `json:"itemCategory" form:"itemCategory" validate:"omitempty,oneof=electronics homeAndGarden fashion beauty health sports outdoors automotive books music games toys collectibles art crafts clothing baby beauty petSupplies travel"`
 	OwnershipHistory string `json:"ownershipHistory" form:"ownershipHistory" validate:"omitempty,oneof=firstOwner secondOwner multipleOwners"`
 	Authenticity     string `json:"authenticity" form:"authenticity" validate:"omitempty,oneof=authentic replica unauthorized"`
 }
