@@ -8,8 +8,10 @@ import (
 	"mime"
 	"os"
 	"strconv"
+	"strings"
 	"swapper/models"
 
+	"github.com/brianvoe/gofakeit/v7"
 	"github.com/ravendb/ravendb-go-client"
 )
 
@@ -172,4 +174,33 @@ func AddProductAttachments(base64Encoded []string, i *models.Item, store *ravend
 		}
 	}
 	return nil
+}
+
+// Color list for checking in titles
+var colors = []string{"red", "green", "blue", "black", "white", "yellow", "orange", "purple", "pink", "brown"}
+
+func inferColor(title string) string {
+	for _, color := range colors {
+		if strings.Contains(strings.ToLower(title), color) {
+			return color
+		}
+	}
+	return "not specified"
+}
+
+func RandString(arr []string) string {
+	return arr[gofakeit.Number(0, len(arr)-1)]
+}
+
+func InferAttributes(product Product, dbCat string) models.Attributes {
+	return models.Attributes{
+		Condition:        RandString([]string{"new", "used", "refurbished"}),
+		Size:             RandString([]string{"small", "medium", "large"}),
+		Color:            inferColor(product.Title),
+		ShippingOptions:  RandString([]string{"localPickup", "domesticShipping", "internationalShipping"}),
+		OwnershipHistory: RandString([]string{"firstOwner", "secondOwner", "multipleOwners"}),
+		Authenticity:     RandString([]string{"authentic", "replica", "unauthorized"}),
+		ListingType:      RandString([]string{"sale", "rent", "exchange"}),
+		ItemCategory:     dbCat,
+	}
 }
