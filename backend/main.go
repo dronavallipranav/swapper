@@ -16,6 +16,9 @@ func getDocumentStore(databaseName string) (*ravendb.DocumentStore, error) {
 	if err := store.Initialize(); err != nil {
 		return nil, err
 	}
+
+	store.GetConventions().MaxNumberOfRequestsPerSession = 1000 // this is bad practice
+
 	return store, nil
 }
 
@@ -42,6 +45,9 @@ func main() {
 		log.Fatalf("Failed to execute index: %v", err)
 		return
 	}
+
+	// Seed the database
+	// seeding.Seed(documentStore)
 
 	setupRoutes(r, documentStore)
 
