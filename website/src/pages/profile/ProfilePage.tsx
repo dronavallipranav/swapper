@@ -57,7 +57,7 @@ const UserProfile = () => {
           <h2 className="text-xl text-gray-600">
             {userPage?.username}'s Rating:{" "}
             <span className="w-3 h-3 inline-block mr-1">{filledStar}</span>{" "}
-            {userPage?.avgRating}{" "}
+            {userPage?.avgRating ? userPage?.avgRating / 2 : 0}{" "}
           </h2>
           {isCurrentUser && (
             <div className="mt-4">
