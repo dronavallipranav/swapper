@@ -36,6 +36,7 @@ func (h *UserHandler) RegisterUserRoutes(r *gin.Engine) {
 	r.PUT("/user", middleware.AuthMiddleware(), h.UpdateUser)
 	r.GET("/users/:id", h.GetUser)
 	r.GET("/users/:id/ratings", middleware.AuthMiddleware(), h.GetUserRatings)
+	r.GET("/users/items", h.GetUserItems)
 }
 
 type SignUpRequest struct {
@@ -499,4 +500,64 @@ func (h *UserHandler) GetUserRatings(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"ratings": ratings})
+}
+
+// gets user items
+func (h *UserHandler) GetUserItems(c *gin.Context) {
+	userID := c.Query("UserID")
+
+	// Check if userID is empty and handle accordingly
+	if userID == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID parameter is required"})
+		return
+	}
+	fmt.Println("userID", userID)
+	session, err := h.Store.OpenSession("")
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to open session"})
+		return
+	}
+	defer session.Close()
+
+	var items []*models.Item
+	q := session.QueryCollection("Items")
+	q = q.WhereEquals("userId", userID)
+	err = q.GetResults(&items)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query items"})
+		return
+	}
+
+	for _, item := range items {
+		var ratings []*models.Rating
+		ratingsQuery := session.QueryCollection("Ratings") // Adjust if you have a specific collection name for ratings
+		ratingsQuery = ratingsQuery.WhereEquals("recipientID", item.ID).AndAlso().WhereEquals("recipientIsItem", true)
+		err = ratingsQuery.GetResults(&ratings)
+		if err != nil {
+			fmt.Println(err.Error())
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to query ratings for item"})
+			continue
+		}
+
+		totalRatings := len(ratings)
+		var sumRatings int
+		for _, rating := range ratings {
+			sumRatings += rating.Stars
+		}
+		avgRating := float64(0)
+		if totalRatings > 0 {
+			avgRating = float64(sumRatings) / float64(totalRatings)
+		}
+
+		item.NumRatings = totalRatings
+		item.AvgRating = avgRating
+
+		attachmentData, err := getItemAttachments(c, 1, item, session)
+		if err != nil {
+			return // error is already added to gin context
+		}
+		item.Attachments = attachmentData
+	}
+
+	c.JSON(http.StatusOK, gin.H{"items": items})
 }

@@ -7,6 +7,11 @@ export const fetchItemById = async (itemId: string): Promise<Item> => {
   return response.data.item;
 };
 
+export const fetchItemsByUserId = async (userId: string): Promise<Item[]> => {
+  const response = await api.get<{ items: Item[] }>(`/users/${userId}/items`);
+  return response.data.items;
+}
+
 export const fetchAllItems = async ({
   latitude,
   longitude,

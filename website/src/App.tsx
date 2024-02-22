@@ -4,6 +4,7 @@ import AboutPage from "./pages/AboutPage";
 import ItemPage from "./pages/Items/ItemPage";
 import LoginPage from "./pages/Login";
 import RegisterPage from "./pages/Register";
+import ProfilePage from "./pages/profile/ProfilePage";
 import ProfileSettings from "./pages/profile/ProfileSettings";
 import MessagePanel from "./components/MessagePanel";
 import ConversationsPage from "./pages/ConversationsPage";
@@ -11,6 +12,7 @@ import LogoutPage from "./pages/LogoutPage";
 import { AuthProvider } from "./contexts/AuthContext";
 import { NewItemPage } from "./pages/Items/NewItemPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+
 function App() {
   return (
     <>
@@ -58,7 +60,15 @@ function App() {
 
               {/* Profile Routes */}
               <Route
-                path="/profile"
+                path="/profile/:userID"
+                element={
+                  <ProtectedRoute>
+                    <ProfilePage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/profile/settings"
                 element={
                   <ProtectedRoute>
                     <ProfileSettings />
