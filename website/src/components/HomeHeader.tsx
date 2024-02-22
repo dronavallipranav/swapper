@@ -94,7 +94,7 @@ const HomeHeader: React.FC<HeaderProps> = ({
               />
             </svg>
           </button>
-          <Link to="/" className="btn btn-ghost pl-6 normal-case text-sky-500 text-xl">
+          <Link to="/" className="btn btn-ghost md:pl-6 normal-case text-sky-500 text-xl">
           <img src={Logo} alt="Logo" className="w-6 h-6 mr-1" />
             Swapper
           </Link>

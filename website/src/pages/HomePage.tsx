@@ -179,7 +179,7 @@ const HomePage = () => {
           <AttributeSelector onAttributesChange={updateAttributes} />
         </div>
 
-        <div className="flex justify-center pb-4 flex-wrap gap-2">
+        <div className="flex justify-center pb-5 flex-wrap gap-2">
         {/* Ignore categories without buttons mapped to them */}
         {categories &&
           categories.map(
