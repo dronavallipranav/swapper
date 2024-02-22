@@ -36,6 +36,9 @@ const MessagePanel: React.FC = () => {
     }
   };
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }
   interface GroupedMessage {
     user: string;
     messages: Message[];
@@ -94,18 +97,23 @@ const MessagePanel: React.FC = () => {
     };
 
     fetchMessages();
+    const interval = setInterval(fetchMessages, 2000); 
+    return () => clearInterval(interval);
+  }, [user, userID]);
+
+  useEffect(() => {
     if (messages.length > 0) {
       const groupedMessages = groupMessages(messages);
       setGroupedMessages(groupedMessages);
     }
-  }, [user, userID, messages]);
-
+    scrollToBottom();
+  }, [messages]);
+  
   return (
     <div>
       <Header />
       <div className="message-panel p-4 flex flex-col justify-between h-full min-h-screen">
         <div
-          ref={messagesEndRef}
           className="messages overflow-y-auto flex flex-col gap-2"
         >
           {groupedMessages.length > 0 ? (
@@ -176,6 +184,7 @@ const MessagePanel: React.FC = () => {
                     )}
                   </div>
                 ))}
+                <div ref={messagesEndRef} />
               </div>
             ))
           ) : (
@@ -197,7 +206,7 @@ const MessagePanel: React.FC = () => {
             }}
             placeholder="Write a message..."
           ></textarea>
-          <button className="btn btn-primary" onClick={sendMessage}>
+          <button className="btn bg-sky-500 hover:bg-sky-600 text-white" onClick={sendMessage}>
             Send
           </button>
         </div>
