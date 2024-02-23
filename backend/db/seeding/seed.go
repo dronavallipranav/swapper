@@ -140,7 +140,7 @@ func Seed(store *ravendb.DocumentStore) {
 		return
 	}
 
-	max_products := 5000
+	max_products := 10000
 	product_ids := make([]string, max_products)
 
 	// add products to the product_ids array
@@ -156,7 +156,7 @@ func Seed(store *ravendb.DocumentStore) {
 	if len(items) < max_products {
 		for i := len(items); i < max_products; i++ {
 			// lets pick a random product from the products array, since I think they're pre-sorted
-			product := products[gofakeit.Number(0, len(products)-1)]
+			product := products[i]
 
 			if i%1000 == 0 {
 				fmt.Printf("Seeding product %d of %d\n", i, max_products)

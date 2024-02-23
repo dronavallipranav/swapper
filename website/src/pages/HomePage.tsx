@@ -60,11 +60,12 @@ const HomePage = () => {
       .catch((e) => {});
   }, []);
 
-  useEffect(() => {
+  /*useEffect(() => {
     setAttributes((prev) => {
       if (selectedCategories.includes("All")) {
         return { ...prev, itemCategory: [] };
       }
+
       // Extract itemCategory from previous attributes
       const { itemCategory: prevItemCategory = [] } = prev;
 
@@ -86,7 +87,34 @@ const HomePage = () => {
       // If there's no change, return previous attributes to avoid unnecessary re-renders
       return prev;
     });
+  }, [selectedCategories, setAttributes]);*/
+
+  useEffect(() => {
+    setAttributes((prev) => {
+      // If "All" is selected, reset itemCategory to an empty array
+      if (selectedCategories.includes("All")) {
+        return { ...prev, itemCategory: [] };
+      }
+  
+      // Since we now want to ensure only one category can be selected (excluding "All"),
+      // we select the first category from selectedCategories that is not "All",
+      // or maintain the current itemCategory if no new category is selected.
+      const newCategory = selectedCategories.find((category) => category !== "All");
+  
+      // Extract itemCategory from previous attributes
+      const { itemCategory: prevItemCategory = [] } = prev;
+  
+      // If there's a new category and it's different from the current one, update it.
+      // Otherwise, keep the previous itemCategory. This check prevents unnecessary re-renders.
+      if (newCategory && (!prevItemCategory.length || newCategory !== prevItemCategory[0])) {
+        return { ...prev, itemCategory: [newCategory] };
+      }
+  
+      // If there's no new selection or no change, return previous attributes
+      return prev;
+    });
   }, [selectedCategories, setAttributes]);
+  
 
   
   const handleClickOutside = (event: React.MouseEvent | MouseEvent) => {
@@ -205,6 +233,9 @@ const HomePage = () => {
                     } else {
                       // Add the category to the selection
                       // if we've selected "All", clear the selection and select only "All"
+                      setSelectedCategories([category]);
+                      return;
+
                       if (category === "All") {
                         setSelectedCategories(["All"]);
                       } else if (selectedCategories.includes("All")) {

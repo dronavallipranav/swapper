@@ -197,7 +197,6 @@ func InferAttributes(product Product, dbCat string) models.Attributes {
 		Condition:        RandString([]string{"new", "used", "refurbished"}),
 		Size:             RandString([]string{"small", "medium", "large"}),
 		Color:            inferColor(product.Title),
-		ShippingOptions:  RandString([]string{"localPickup", "domesticShipping", "internationalShipping"}),
 		OwnershipHistory: RandString([]string{"firstOwner", "secondOwner", "multipleOwners"}),
 		Authenticity:     RandString([]string{"authentic", "replica", "unauthorized"}),
 		ListingType:      RandString([]string{"sale", "rent", "exchange"}),
