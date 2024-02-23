@@ -30,7 +30,6 @@ select new {
         item.attributes.condition,
         item.attributes.size,
         item.attributes.color,
-        item.attributes.shippingOptions,
         item.attributes.listingType,
         item.attributes.itemCategory,
         item.attributes.ownershipHistory,
@@ -44,7 +43,6 @@ select new {
 	Attributes_ItemCategory = item.attributes.itemCategory,
 	Attributes_ListingType = item.attributes.listingType,
 	Attributes_Size = item.attributes.size,
-	Attributes_ShippingOptions = item.attributes.shippingOptions,
 	Attributes_OwnershipHistory = item.attributes.ownershipHistory,
 	Attributes_Authenticity = item.attributes.authenticity,
 	Categories = item.categories,
@@ -66,7 +64,6 @@ select new {
 	res.Store("Attributes_ItemCategory", ravendb.FieldStorageYes)
 	res.Store("Attributes_ListingType", ravendb.FieldStorageYes)
 	res.Store("Attributes_Size", ravendb.FieldStorageYes)
-	res.Store("Attributes_ShippingOptions", ravendb.FieldStorageYes)
 	res.Store("Attributes_OwnershipHistory", ravendb.FieldStorageYes)
 	res.Store("Attributes_Authenticity", ravendb.FieldStorageYes)
 	res.Store("Categories", ravendb.FieldStorageYes)
