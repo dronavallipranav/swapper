@@ -37,7 +37,6 @@ Swapper is an open-source platform designed to revolutionize the way people exch
 
 - Go (version 1.21)
 - Node.js and npm
-- RavenDB running instance
 
 ### Setup and Installation
 
@@ -51,6 +50,7 @@ cd swapper
 ```sh
 cd backend
 docker compose up -d
+go get
 go run main.go
 ```
 3. **Install required npm packages and run dev server**
