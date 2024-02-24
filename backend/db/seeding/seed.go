@@ -86,6 +86,9 @@ func Seed(store *ravendb.DocumentStore) {
 	userIDs := make([]string, fakeCount)
 	// add users to the userIDs array
 	for i, user := range users {
+		if i >= fakeCount {
+			break
+		}
 		userIDs[i] = user.ID
 	}
 
@@ -145,6 +148,9 @@ func Seed(store *ravendb.DocumentStore) {
 
 	// add products to the product_ids array
 	for i, item := range items {
+		if i >= max_products {
+			break
+		}
 		product_ids[i] = item.ID
 	}
 
@@ -223,7 +229,7 @@ func Seed(store *ravendb.DocumentStore) {
 		return
 	}
 
-	max_reviews := 50000
+	max_reviews := 100000
 
 	// count number of reviews
 	var ratings []*models.Rating
