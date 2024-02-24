@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"swapper/api"
-	"swapper/db/seeding"
 	"swapper/indexing"
 
 	"github.com/gin-contrib/cors"
@@ -48,7 +47,7 @@ func main() {
 	}
 
 	// Seed the database
-	seeding.Seed(documentStore)
+	//seeding.Seed(documentStore)
 
 	setupRoutes(r, documentStore)
 

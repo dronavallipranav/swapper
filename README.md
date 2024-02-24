@@ -10,6 +10,27 @@ Swapper is an open-source platform designed to revolutionize the way people exch
 - **Ratings and Reviews**: Users can rate and review their experiences with other members, promoting trust and reliability within the community.
 - **Search and Filters**: Advanced search options utilizing fuzzy searching over all item fields, and the item attributes and category filters help users find exactly what they're looking regardless of the item's properties.
 
+## Demo
+
+[![Swapper Demo](./imgs/video-thumbnail.png)](https://youtu.be/0oFyaT0ixN0)
+
+## Page Previews
+
+### Home Page
+![Home Page](./imgs/homepage.jpg)
+
+### Item Listing
+![Item Listing](./imgs/item-details.jpg)
+
+### Messages
+![Messages](./imgs/messages.jpg)
+
+### Reviews
+![Reviews](./imgs/reviews.jpg)
+
+### User Profile
+![User Profile](./imgs/user.jpg)
+
 ## Getting Started
 
 ### Prerequisites
